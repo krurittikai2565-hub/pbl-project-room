@@ -379,7 +379,7 @@ const REVIEW = {pending:'รอครูตรวจ',approved:'ครูอน�
 
 /* ======================== state & API ======================== */
 const S = {token:'',role:'',data:null,view:'login',loginTab:'student',reg:null,ob:'lesson',quiz:{},
-  tab:'P',step:1,open:'',drafts:{},tGroup:null,tTab:'P',tStep:1,adminTab:'overview',adminQ:'',lookup:null,showAddTeacher:false,tFilter:''};
+  tab:'R',step:1,open:'',drafts:{},tGroup:null,tTab:'R',tStep:1,tView:'groups',gStep:1,gOpen:'',adminTab:'overview',adminQ:'',lookup:null,showAddTeacher:false,tFilter:''};
 const store = {
   get(k){try{return sessionStorage.getItem(k)||''}catch(e){return ''}},
   set(k,v){try{v?sessionStorage.setItem(k,v):sessionStorage.removeItem(k)}catch(e){}}
@@ -492,11 +492,11 @@ function viewLogin(){
     <section class="login-intro">
       <div class="eyebrow">วิชาโครงงาน · ปวช./ปวส.</div>
       <h1>ห้องโครงงาน PBL<br>รูปแบบที่ 3 จัดเฉพาะบางหน่วย</h1>
-      <p class="lead">เลือกหน่วยการเรียนรู้ที่เหมาะสมในรายวิชามาจัดแบบโครงงานเป็นฐาน หน่วยอื่นเรียนตามปกติ ทำงานเป็นกลุ่ม ใช้ Prompt AI ตามคู่มือทีละขั้น และส่งครูตรวจในจุดสำคัญ</p>
+      <p class="lead">เลือกหน่วยการเรียนรู้ที่เหมาะสมในรายวิชามาจัดแบบโครงงานเป็นฐาน หน่วยอื่นเรียนตามปกติ ครูจัดการเรียนรู้ตาม 6 ขั้น ผู้เรียนทำงานเป็นกลุ่มตาม 11 ขั้นจนได้เล่มรายงาน ใช้ Prompt AI ทีละขั้น และส่งครูตรวจในจุดสำคัญ</p>
       <div class="paths">
-        <div class="path"><div class="big">6</div><h3>ขั้นการทำโครงงาน</h3>
+        <div class="path"><div class="big">6</div><h3>ขั้นการสอนของครู</h3>
           <ol><li>การเตรียมความพร้อม</li><li>การกำหนดและเลือกหัวข้อ</li><li>การเขียนเค้าโครง</li><li>การปฏิบัติงานโครงงาน</li><li>การนำเสนอผลงาน</li><li>การประเมินโครงงาน</li></ol></div>
-        <div class="path r"><div class="big">11</div><h3>ขั้นการเขียนเล่มรายงาน</h3>
+        <div class="path r"><div class="big">11</div><h3>ขั้นที่ผู้เรียนทำในระบบ</h3>
           <ol><li>Project Brief</li><li>ค้นคว้าแหล่งอ้างอิง</li><li>เขียนบทที่ 1–3</li><li>ตรวจบทที่ 1–3</li><li>…จนถึงตรวจความพร้อมก่อนนำเสนอจริง</li></ol></div>
       </div>
     </section>
@@ -543,7 +543,7 @@ function viewLesson(){
     <section><h2>1. รูปแบบที่ 3 คืออะไร</h2>
      <p>ครูเลือก <b>บางหน่วยการเรียนรู้</b> ที่เหมาะสมในรายวิชามาจัดการเรียนรู้แบบโครงงานเป็นฐาน (Project-Based Learning) ผู้เรียนเรียนเนื้อหาของหน่วยนั้นผ่านการลงมือแก้ปัญหาจริงจนได้ชิ้นงาน ส่วน <b>หน่วยอื่นยังเรียนตามปกติ</b></p>
      <div class="tablebox"><table class="compare"><thead><tr><th></th><th>หน่วยที่จัดแบบโครงงาน</th><th>หน่วยอื่น</th></tr></thead><tbody>
-      <tr><td>วิธีเรียน</td><td class="hl">ทำโครงงานเป็นกลุ่ม ตาม 6 ขั้น</td><td>เรียนตามแผนการสอนปกติ</td></tr>
+      <tr><td>วิธีเรียน</td><td class="hl">ครูจัดการเรียนรู้ 6 ขั้น ผู้เรียนทำงานกลุ่มและเขียนเล่ม 11 ขั้น</td><td>เรียนตามแผนการสอนปกติ</td></tr>
       <tr><td>ผลงาน</td><td class="hl">ชิ้นงาน/ผลการทดลอง และเล่มรายงาน</td><td>ใบงาน แบบฝึกหัด แบบทดสอบ</td></tr>
       <tr><td>การประเมิน</td><td class="hl">ประเมินกระบวนการ ชิ้นงาน การนำเสนอ</td><td>ตามเกณฑ์ปกติของรายวิชา</td></tr>
      </tbody></table></div></section>
@@ -552,9 +552,10 @@ function viewLesson(){
      <li>ทำแล้วได้ <b>ชิ้นงานหรือผลลัพธ์ที่วัดได้</b> เช่น อุปกรณ์ ระบบ สูตร บริการ</li>
      <li>ตรงกับ <b>สมรรถนะรายวิชา</b> ที่ต้องฝึก</li>
      <li>มี <b>เวลาเรียน วัสดุ และงบประมาณ</b> เพียงพอ และปลอดภัย</li></ul></section>
-    <section><h2>3. สองเส้นทางในระบบนี้</h2>
-     <ol><li><b>การทำโครงงาน 6 ขั้น</b> ตั้งแต่เตรียมความพร้อมจนถึงประเมินโครงงาน แต่ละขั้นมีขั้นย่อยและ Prompt ให้ใช้</li>
-     <li><b>การเขียนเล่มรายงาน 11 ขั้น</b> เขียนรายงาน 5 บทพร้อมบรรณานุกรมและเตรียมการนำเสนอ โดยมีจุดที่ครูต้องตรวจ</li></ol></section>
+    <section><h2>3. ใครทำอะไรในระบบนี้</h2>
+     <ol><li><b>ครูสอนตามขั้นการทำโครงงาน 6 ขั้น</b> ตั้งแต่เตรียมความพร้อม เลือกหัวข้อ เขียนเค้าโครง ปฏิบัติงาน นำเสนอ จนถึงประเมินโครงงาน ครูจะพาทำในชั้นเรียน</li>
+     <li><b>ผู้เรียนทำงานในระบบตาม 11 ขั้น</b> ตั้งแต่ Project Brief จนถึงตรวจความพร้อมก่อนนำเสนอจริง แต่ละขั้นมี Prompt ช่องบันทึกผลงาน และจุดที่ต้องส่งครูตรวจ</li>
+     <li><b>รวมเล่มรายงาน</b> เขียนบทที่ 1–5 แล้วดาวน์โหลดเป็นไฟล์ Word ตามรูปแบบรายงานการวิจัย</li></ol></section>
     <section><h2>4. ใช้ Prompt AI อย่างไรให้ถูกต้อง</h2>
      <ol><li>เลือกขั้นที่กลุ่มกำลังทำอยู่</li>
      <li>คัดลอก Prompt แล้วแทนข้อความใน <span class="ph">[วงเล็บเหลี่ยม]</span> ด้วยข้อมูลจริงของโครงงาน ระบบเติมข้อมูลกลุ่มให้บางส่วนแล้ว <span class="ph filled">สีเขียว</span></li>
@@ -664,7 +665,8 @@ function statusChips(r,cp){
 function viewStudent(){
   const b=S.data.bundle, g=b.group, sum=b.summary;
   const pblUnits=(g.units||[]).filter(u=>u.pbl);
-  const tabs=[['P','ทำโครงงาน 6 ขั้น'],['R','เขียนเล่มรายงาน 11 ขั้น'],['D','เล่มรายงาน (Word)'],['G','ข้อมูลกลุ่ม']];
+  const tabs=[['R','ทำโครงงาน 11 ขั้น'],['D','เล่มรายงาน (Word)'],['G','ข้อมูลกลุ่ม']];
+  const dst=docStatus(b);
   const revise=b.progress.filter(r=>r.review_status==='revise').length;
   return `<div class="band"><div class="wrap">
     <div class="stack" style="gap:8px;min-width:0">
@@ -674,12 +676,12 @@ function viewStudent(){
       <div class="row" style="gap:6px">${pblUnits.map(u=>`<span class="tag pbl">หน่วยที่ ${e(u.no)} ${e(u.name)}</span>`).join('')}<span class="small muted">${(g.units||[]).length-pblUnits.length>0?'หน่วยอื่นอีก '+((g.units||[]).length-pblUnits.length)+' หน่วยเรียนตามปกติ':''}</span></div>
     </div>
     <div class="meters">
-      <div><div class="lbl"><span>ทำโครงงาน 6 ขั้น</span><span class="pct">${sum.pPct}%</span></div><div class="meter"><i style="width:${sum.pPct}%"></i></div><div class="small muted">${sum.P}/${sum.pTotal} ขั้นย่อย</div></div>
-      <div><div class="lbl"><span>เขียนเล่มรายงาน 11 ขั้น</span><span class="pct">${sum.rPct}%</span></div><div class="meter amber"><i style="width:${sum.rPct}%"></i></div><div class="small muted">${sum.R}/${sum.rTotal} ขั้น</div></div>
+      <div><div class="lbl"><span>ทำโครงงาน 11 ขั้น</span><span class="pct">${sum.rPct}%</span></div><div class="meter amber"><i style="width:${sum.rPct}%"></i></div><div class="small muted">${sum.R}/${sum.rTotal} ขั้น</div></div>
+      <div><div class="lbl"><span>เนื้อหาเล่มรายงาน</span><span class="pct">${docPct(b)}%</span></div><div class="meter"><i style="width:${docPct(b)}%"></i></div><div class="small muted">${dst.reqDone}/${dst.reqTotal} ส่วน</div></div>
       ${revise?`<div class="note danger small">ครูส่งกลับให้แก้ไข ${revise} รายการ</div>`:''}
     </div>
   </div><div class="wrap"><nav class="tabs">${tabs.map(([k,l])=>`<button class="${S.tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</nav></div></div>
-  <main class="wrap">${S.tab==='P'?viewTrackP(b,false):S.tab==='R'?viewTrackR(b,false):S.tab==='D'?viewDoc(b):viewGroupInfo()}</main>`;
+  <main class="wrap">${S.tab==='D'?viewDoc(b):S.tab==='G'?viewGroupInfo():viewTrackR(b,false)}</main>`;
 }
 function viewGroupInfo(){
   return `<div class="section">${viewSetup(false)}<h2>สมาชิกและครูผู้สอน</h2>${viewTeam(false)}</div>`;
@@ -706,7 +708,7 @@ function viewTrackP(b,teacher){
 }
 function viewTrackR(b,teacher){
   const m=pmap(b.progress);
-  return `<div class="section"><div class="step-head"><div class="step-no" style="color:var(--amber)">11</div><div class="stack" style="gap:4px"><div class="eyebrow">ภาค 2 ของคู่มือ หน้า 43–61</div><h2>การเขียนเล่มรายงานโครงงาน</h2><span class="small muted">เขียนรายงานให้ครบ 5 บท พร้อมบรรณานุกรมและเตรียมการนำเสนอ ขั้นที่มีตรา “ครูตรวจ” ต้องส่งให้ครูตรวจ</span></div></div>
+  return `<div class="section"><div class="step-head"><div class="step-no" style="color:var(--amber)">11</div><div class="stack" style="gap:4px"><div class="eyebrow">ภาค 2 ของคู่มือ หน้า 43–61</div><h2>ทำโครงงานและเขียนเล่มรายงาน 11 ขั้น</h2><span class="small muted">เขียนรายงานให้ครบ 5 บท พร้อมบรรณานุกรมและเตรียมการนำเสนอ ขั้นที่มีตรา “ครูตรวจ” ต้องส่งให้ครูตรวจ</span></div></div>
    <div class="tasks">${R_STEPS.map(r=>taskCard('R',r.no,0,String(r.no),r.t,r.task,r.p,r.cp,m,teacher,r.teacher)).join('')}</div></div>`;
 }
 function taskCard(track,step,sub,label,title,desc,prompt,cp,m,teacher,teacherTask){
@@ -940,9 +942,33 @@ async function exportDocx(b){
   toast(doc.complete?'ดาวน์โหลดเล่มรายงานแล้ว':'ดาวน์โหลดฉบับร่างแล้ว');
 }
 
+function docPct(b){const st=docStatus(b);return Math.round(st.reqDone*100/st.reqTotal)}
+function viewDocRead(b){
+  const m=pmap(b.progress), info=docInfo(b), st=docStatus(b);
+  return `<div class="section"><div class="card row"><div class="grow small muted">เนื้อหาที่กลุ่มบันทึกไว้ ${st.reqDone}/${st.reqTotal} ส่วน${info.college?' · '+e(info.college):''}</div><button class="btn primary" data-a="ddownload">ดาวน์โหลดเล่มรายงาน (.docx)</button></div>
+   <div class="tasks">${DOC_SECTIONS.map(sec=>{const r=m['D-'+sec.id+'-0'];const has=r&&r.work.trim();
+    return `<article class="task"><div class="task-h" style="cursor:default"><span class="k">${sec.chapter?'บท '+sec.chapter:'—'}</span><span class="tt">${e(sec.chapter?sec.title:sec.t)}</span><span class="chips">${has?'<span class="chip st-done">เขียนแล้ว</span>':'<span class="chip st-todo">ยังไม่ได้เขียน</span>'}</span></div>
+     ${has?`<div class="task-b"><div class="worktext">${e(r.work)}</div><span class="small muted">บันทึกล่าสุด ${e(r.updated_at)} โดย <span class="mono">${e(r.updated_by)}</span></span></div>`:''}</article>`}).join('')}</div></div>`;
+}
+function viewGuide(){
+  const s=P_STEPS[S.gStep-1];
+  const rail=`<nav class="rail">${P_STEPS.map(x=>`<button class="${S.gStep===x.no?'on':''}" data-a="gstep" data-v="${x.no}"><span class="n">${x.no}</span><span class="t">${e(x.title)}</span><span class="s">${x.subs.length} ขั้นย่อย · หน้า ${x.pages}</span></button>`).join('')}</nav>`;
+  const cards=s.subs.map((x,i)=>{const key='P-'+s.no+'-'+(i+1), open=S.gOpen===key;
+    return `<article class="task ${open?'open':''}" id="task-${key}"><button class="task-h" data-a="gopen" data-k="${key}" aria-expanded="${open}"><span class="k">${s.no}.${i+1}</span><span class="tt">${e(x.t)}</span><span class="chips">${x.cp?'<span class="stamp">จุดตรวจของครู</span>':''}</span></button>
+     ${open?`<div class="task-b"><p class="muted">${e(x.d)}</p>
+      <div class="prompt"><div class="prompt-h"><span class="grow">Prompt สำหรับขั้นนี้ · ครูใช้สาธิตในชั้นเรียน หรือมอบให้ผู้เรียนใช้</span><button class="btn sm" data-a="copy" data-k="${key}">คัดลอก</button></div><pre id="pr-${key}">${promptHTML(x.p)}</pre></div></div>`:''}</article>`}).join('');
+  return `<div class="work">${rail}<section style="min-width:0">
+    <div class="step-head"><div class="step-no">${String(s.no).padStart(2,'0')}</div><div class="stack" style="gap:4px"><div class="eyebrow">คู่มือการสอน · ขั้นการทำโครงงาน ${s.no} จาก 6</div><h2>${e(s.title)}</h2><span class="small muted">อ้างอิงคู่มือ Prompt AI วิชาโครงงาน หน้า ${s.pages} · ส่วนนี้แสดงเฉพาะครู ผู้เรียนทำงานในระบบตาม 11 ขั้น</span></div></div>
+    <div class="tasks">${cards}</div></section></div>`;
+}
 /* ======================== teacher ======================== */
 function viewTeacher(){
   if(S.tGroup) return viewTeacherGroup();
+  const tabs=`<div class="band"><div class="wrap" style="grid-template-columns:1fr;padding-block:14px 0"><nav class="tabs">${[['groups','กลุ่มโครงงาน'],['guide','คู่มือการสอน 6 ขั้น']].map(([k,l])=>`<button class="${S.tView===k?'on':''}" data-a="tview" data-v="${k}">${l}</button>`).join('')}</nav></div></div>`;
+  if(S.tView==='guide') return tabs+`<main class="wrap">${viewGuide()}</main>`;
+  return tabs+viewTeacherGroups();
+}
+function viewTeacherGroups(){
   const d=S.data, gs=d.groups;
   const pending=gs.reduce((a,b)=>a+b.summary.pending,0);
   return `<main class="wrap section">
@@ -953,24 +979,24 @@ function viewTeacher(){
    <div class="stat"><div class="small muted">นักศึกษาทั้งหมด</div><div class="v">${gs.reduce((a,b)=>a+b.members.length,0)}</div></div></div>
    ${gs.length?`<div class="glist">${gs.sort((a,b)=>b.summary.pending-a.summary.pending).map(b=>`<button class="gitem" data-a="tgroup" data-v="${e(b.group.group_id)}">
      <div style="min-width:0"><b>${e(b.group.project_name||'(ยังไม่ตั้งชื่อ)')}</b><div class="small muted"><span class="mono">${e(b.group.group_id)}</span> · ${e(b.group.subject_name||'')} · ${b.members.length} คน</div></div>
-     <div class="mini-meter"><span>6 ขั้น</span><div class="meter"><i style="width:${b.summary.pPct}%"></i></div><span class="pct">${b.summary.pPct}%</span></div>
-     <div class="mini-meter"><span>เล่ม</span><div class="meter amber"><i style="width:${b.summary.rPct}%"></i></div><span class="pct">${b.summary.rPct}%</span></div>
+     <div class="mini-meter"><span>11 ขั้น</span><div class="meter amber"><i style="width:${b.summary.rPct}%"></i></div><span class="pct">${b.summary.rPct}%</span></div>
+     <div class="mini-meter"><span>เล่ม</span><div class="meter"><i style="width:${docPct(b)}%"></i></div><span class="pct">${docPct(b)}%</span></div>
      <div>${b.summary.pending?`<span class="chip rv-pending">รอตรวจ ${b.summary.pending}</span>`:`<span class="small muted">${e(b.summary.last?'อัปเดต '+b.summary.last.slice(0,10):'ยังไม่เริ่ม')}</span>`}</div></button>`).join('')}</div>`:
    `<div class="card stack"><h3>ยังไม่มีกลุ่มที่เลือกท่าน</h3><p class="muted">แจ้งรหัสครู <b class="mono">${e(d.me.teacher_id)}</b> ให้นักศึกษาใช้เลือกครูผู้สอนในขั้นตั้งกลุ่ม</p></div>`}
   </main>`;
 }
 function viewTeacherGroup(){
   const b=S.tGroup, g=b.group;
-  const tabs=[['P','ทำโครงงาน 6 ขั้น'],['R','เขียนเล่มรายงาน 11 ขั้น'],['M','สมาชิก']];
-  const pendP=b.progress.filter(r=>r.track==='P'&&r.review_status==='pending').length, pendR=b.progress.filter(r=>r.track==='R'&&r.review_status==='pending').length;
+  const tabs=[['R','ทำโครงงาน 11 ขั้น'],['D','เล่มรายงาน'],['M','สมาชิก']];
+  const pendR=b.progress.filter(r=>r.track==='R'&&r.review_status==='pending').length;
   return `<div class="band"><div class="wrap"><div class="stack" style="gap:8px;min-width:0">
     <div class="row"><button class="btn ghost sm" data-a="tback">← กลับรายการกลุ่ม</button><span class="spacer"></span><button class="btn sm" data-a="ddownload">ดาวน์โหลดเล่มรายงาน (.docx)</button></div>
     <div class="eyebrow">กลุ่ม <span class="mono">${e(g.group_id)}</span> · โครงงาน${e(g.project_type)}</div><h1>${e(g.project_name||'(ยังไม่ตั้งชื่อ)')}</h1>
     <div class="meta"><span>รายวิชา <b>${e([g.subject_code,g.subject_name].filter(Boolean).join(' '))}</b></span><span>หน่วยที่จัดแบบโครงงาน <b>${e((g.units||[]).filter(u=>u.pbl).map(u=>u.no+' '+u.name).join(', ')||'—')}</b></span></div></div>
-    <div class="meters"><div><div class="lbl"><span>ทำโครงงาน 6 ขั้น</span><span class="pct">${b.summary.pPct}%</span></div><div class="meter"><i style="width:${b.summary.pPct}%"></i></div></div>
-    <div><div class="lbl"><span>เขียนเล่มรายงาน</span><span class="pct">${b.summary.rPct}%</span></div><div class="meter amber"><i style="width:${b.summary.rPct}%"></i></div></div></div>
-  </div><div class="wrap"><nav class="tabs">${tabs.map(([k,l])=>`<button class="${S.tTab===k?'on':''}" data-a="ttab" data-v="${k}">${l}${k==='P'&&pendP?`<span class="count">${pendP}</span>`:''}${k==='R'&&pendR?`<span class="count">${pendR}</span>`:''}</button>`).join('')}</nav></div></div>
-  <main class="wrap">${S.tTab==='P'?viewTrackP(b,true):S.tTab==='R'?viewTrackR(b,true):
+    <div class="meters"><div><div class="lbl"><span>ทำโครงงาน 11 ขั้น</span><span class="pct">${b.summary.rPct}%</span></div><div class="meter amber"><i style="width:${b.summary.rPct}%"></i></div></div>
+    <div><div class="lbl"><span>เนื้อหาเล่มรายงาน</span><span class="pct">${docPct(b)}%</span></div><div class="meter"><i style="width:${docPct(b)}%"></i></div></div></div>
+  </div><div class="wrap"><nav class="tabs">${tabs.map(([k,l])=>`<button class="${S.tTab===k?'on':''}" data-a="ttab" data-v="${k}">${l}${k==='R'&&pendR?`<span class="count">${pendR}</span>`:''}</button>`).join('')}</nav></div></div>
+  <main class="wrap">${S.tTab==='R'?viewTrackR(b,true):S.tTab==='D'?viewDocRead(b):
    `<div class="section"><div class="card"><div class="tablebox"><table class="tbl"><thead><tr><th>รหัสนักศึกษา</th><th>ชื่อ-สกุล</th><th>ระดับชั้น</th><th>สาขา</th><th>เบอร์โทร</th></tr></thead><tbody>${b.members.map(m=>`<tr><td class="mono">${e(m.student_id)}</td><td>${e(m.name)}</td><td>${e(m.level)}</td><td>${e(m.department)}</td><td class="mono">${e(m.phone)}</td></tr>`).join('')}</tbody></table></div></div></div>`}</main>`;
 }
 
@@ -981,20 +1007,20 @@ function viewAdmin(){
   let body='';
   if(S.tGroup&&t==='groups') return viewTeacherGroup();
   if(t==='overview'){
-    const gs=d.groups, avgP=gs.length?Math.round(gs.reduce((a,b)=>a+b.summary.pPct,0)/gs.length):0, avgR=gs.length?Math.round(gs.reduce((a,b)=>a+b.summary.rPct,0)/gs.length):0;
+    const gs=d.groups, avgD=gs.length?Math.round(gs.reduce((a,b)=>a+docPct(b),0)/gs.length):0, avgR=gs.length?Math.round(gs.reduce((a,b)=>a+b.summary.rPct,0)/gs.length):0;
     body=`${S.defaultPw?'<div class="note danger">ยังใช้รหัสผู้ดูแลเริ่มต้นอยู่ กรุณาเปลี่ยนในแท็บ “ตั้งค่า”</div>':''}
     <div class="stats"><div class="stat"><div class="small muted">นักศึกษา</div><div class="v">${d.students.length}</div></div><div class="stat"><div class="small muted">ครูผู้สอน</div><div class="v">${d.teachers.length}</div></div>
-    <div class="stat"><div class="small muted">กลุ่มโครงงาน</div><div class="v">${gs.length}</div></div><div class="stat"><div class="small muted">เฉลี่ย 6 ขั้น</div><div class="v">${avgP}%</div></div><div class="stat"><div class="small muted">เฉลี่ยเล่มรายงาน</div><div class="v">${avgR}%</div></div>
+    <div class="stat"><div class="small muted">กลุ่มโครงงาน</div><div class="v">${gs.length}</div></div><div class="stat"><div class="small muted">เฉลี่ย 11 ขั้น</div><div class="v">${avgR}%</div></div><div class="stat"><div class="small muted">เฉลี่ยเนื้อหาเล่ม</div><div class="v">${avgD}%</div></div>
     <div class="stat"><div class="small muted">ยังไม่มีกลุ่ม</div><div class="v">${d.students.filter(s=>!s.group_id).length}</div></div></div>
-    <div class="card stack"><h3>ความก้าวหน้าแยกตามครูผู้สอน</h3><div class="tablebox"><table class="tbl"><thead><tr><th>ครูผู้สอน</th><th>กลุ่ม</th><th>รอตรวจ</th><th>เฉลี่ย 6 ขั้น</th><th>เฉลี่ยเล่ม</th></tr></thead><tbody>
-    ${d.teachers.map(tc=>{const mine=gs.filter(b=>b.group.teacher_id===tc.teacher_id);const ap=mine.length?Math.round(mine.reduce((a,b)=>a+b.summary.pPct,0)/mine.length):0;const ar=mine.length?Math.round(mine.reduce((a,b)=>a+b.summary.rPct,0)/mine.length):0;
+    <div class="card stack"><h3>ความก้าวหน้าแยกตามครูผู้สอน</h3><div class="tablebox"><table class="tbl"><thead><tr><th>ครูผู้สอน</th><th>กลุ่ม</th><th>รอตรวจ</th><th>เฉลี่ย 11 ขั้น</th><th>เฉลี่ยเนื้อหาเล่ม</th></tr></thead><tbody>
+    ${d.teachers.map(tc=>{const mine=gs.filter(b=>b.group.teacher_id===tc.teacher_id);const ap=mine.length?Math.round(mine.reduce((a,b)=>a+b.summary.rPct,0)/mine.length):0;const ar=mine.length?Math.round(mine.reduce((a,b)=>a+docPct(b),0)/mine.length):0;
       return `<tr><td>${e(tc.name)}</td><td class="num">${mine.length}</td><td class="num">${mine.reduce((a,b)=>a+b.summary.pending,0)}</td><td class="num">${ap}%</td><td class="num">${ar}%</td></tr>`}).join('')}</tbody></table></div></div>`;
   } else if(t==='groups'){
-    body=`<div class="card"><div class="tablebox"><table class="tbl"><thead><tr><th>รหัสกลุ่ม</th><th>ชื่อโครงงาน</th><th>รายวิชา</th><th>สมาชิก</th><th>ครูผู้สอน</th><th>6 ขั้น</th><th>เล่ม</th><th></th></tr></thead><tbody>
+    body=`<div class="card"><div class="tablebox"><table class="tbl"><thead><tr><th>รหัสกลุ่ม</th><th>ชื่อโครงงาน</th><th>รายวิชา</th><th>สมาชิก</th><th>ครูผู้สอน</th><th>11 ขั้น</th><th>เนื้อหาเล่ม</th><th></th></tr></thead><tbody>
     ${d.groups.map(b=>{const g=b.group;return `<tr><td class="mono">${e(g.group_id)}</td><td style="min-width:200px"><input class="input" id="gn-${e(g.group_id)}" value="${e(g.project_name)}"></td><td>${e(g.subject_name)}</td>
      <td>${b.members.map(m=>e(m.name)).join('<br>')}</td>
      <td><select class="input" id="gt-${e(g.group_id)}"><option value="">— ไม่ระบุ —</option>${d.teachers.map(tc=>`<option value="${e(tc.teacher_id)}" ${tc.teacher_id===g.teacher_id?'selected':''}>${e(tc.name)}</option>`).join('')}</select></td>
-     <td class="num">${b.summary.pPct}%</td><td class="num">${b.summary.rPct}%</td>
+     <td class="num">${b.summary.rPct}%</td><td class="num">${docPct(b)}%</td>
      <td><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-a="agView" data-v="${e(g.group_id)}">ดูงาน</button><button class="btn sm" data-a="agSave" data-v="${e(g.group_id)}">บันทึก</button><button class="btn danger sm" data-a="adel" data-t="groups" data-v="${e(g.group_id)}">ลบ</button></div></td></tr>`}).join('')||'<tr><td colspan="8" class="muted">ยังไม่มีกลุ่ม</td></tr>'}</tbody></table></div></div>`;
   } else if(t==='students'||t==='teachers'){
     const isS=t==='students', rows=(isS?d.students:d.teachers).filter(r=>!S.adminQ||JSON.stringify(r).toLowerCase().includes(S.adminQ.toLowerCase()));
@@ -1091,7 +1117,7 @@ const HANDLERS={
   pickTeacher(el,v){act(async()=>{S.data=await call('saveSetup',{teacher_id:v});toast('เลือกครูผู้สอนแล้ว');render()})},
   toggleAddTeacher(){S.showAddTeacher=!S.showAddTeacher;render()},
   addTeacher(){act(async()=>{S.data=await call('addTeacher',{teacher_id:val('ntId'),name:val('ntName'),phone:val('ntPhone'),department:val('ntDept')});S.showAddTeacher=false;toast('เพิ่มครูและเลือกเป็นครูผู้สอนแล้ว');render()})},
-  enterRoom(){S.view='student';S.tab='P';pickDefaultStep();render();window.scrollTo(0,0)},
+  enterRoom(){S.view='student';S.tab='R';render();window.scrollTo(0,0)},
   tab(el,v){keepUnits();S.tab=v;S.units=null;S.lookup=null;render()},
   step(el,v){S.step=+v;S.open='';render();scrollToWork()},
   open(el){const k=el.dataset.k;S.open=S.open===k?'':k;render();if(S.open)$('task-'+k).scrollIntoView({block:'nearest'})},
@@ -1127,7 +1153,10 @@ const HANDLERS={
     if(unsaved.length&&S.role==='student') toast('มีส่วนที่ยังไม่ได้กดบันทึก ไฟล์จะใช้ข้อความที่บันทึกไว้ล่าสุด',true);
     exportDocx(b).catch(err=>toast('สร้างไฟล์ไม่สำเร็จ: '+err.message,true))},
   /* teacher */
-  tgroup(el,v){act(async()=>{S.tGroup=await call(S.role==='admin'?'adminGroup':'groupDetail',{group_id:v});S.tTab='P';S.tStep=firstPendingStep(S.tGroup);S.tOpen='';render();window.scrollTo(0,0)})},
+  tview(el,v){S.tView=v;render()},
+  gstep(el,v){S.gStep=+v;S.gOpen='';render();scrollToWork()},
+  gopen(el){const k=el.dataset.k;S.gOpen=S.gOpen===k?'':k;render()},
+  tgroup(el,v){act(async()=>{S.tGroup=await call(S.role==='admin'?'adminGroup':'groupDetail',{group_id:v});S.tTab='R';S.tOpen='';render();window.scrollTo(0,0)})},
   tback(){S.tGroup=null;act(async()=>{S.data=await call(S.role==='admin'?'adminOverview':'teacherHome');render()})},
   ttab(el,v){S.tTab=v;S.tOpen='';render()},
   tstep(el,v){S.tStep=+v;S.tOpen='';render();scrollToWork()},
