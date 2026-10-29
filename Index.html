@@ -956,6 +956,11 @@ async function afterLogin(r){
   else {S.data=await call('adminOverview');S.view='admin';S.adminTab='overview';render()}
   window.scrollTo(0,0);
 }
-function showDemoBanner(){$('demo').innerHTML=`<div class="demo-banner"><div class="wrap"><b>โหมดตัวอย่าง</b><span>ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น เมื่อติดตั้งบน Google Apps Script ระบบจะบันทึกลง Google Sheet จริง · รหัสผู้ดูแลตัวอย่าง: <span class="mono">admin1234</span></span><button class="btn ghost sm" onclick="MockServer.reset();location.reload()">ล้างข้อมูลตัวอย่าง</button></div></div>`}
+function showDemoBanner(){
+  try{if(localStorage.getItem('pbl3_hide_demo')==='1')return}catch(err){}
+  $('demo').innerHTML=`<div class="demo-banner"><div class="wrap"><b>โหมดตัวอย่าง</b><span class="grow">ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น เมื่อติดตั้งบน Google Apps Script ระบบจะบันทึกลง Google Sheet จริง · รหัสผู้ดูแลตัวอย่าง: <span class="mono">admin1234</span></span><button class="btn ghost sm" id="demoReset">ล้างข้อมูลตัวอย่าง</button><button class="btn ghost sm" id="demoClose" aria-label="ปิดแถบนี้">ปิด ✕</button></div></div>`;
+  $('demoReset').onclick=()=>{MockServer.reset();location.reload()};
+  $('demoClose').onclick=()=>{try{localStorage.setItem('pbl3_hide_demo','1')}catch(err){}$('demo').innerHTML=''};
+}
 boot();
 </script>
