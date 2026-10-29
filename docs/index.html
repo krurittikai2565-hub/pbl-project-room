@@ -523,7 +523,7 @@ function viewLogin(){
 /* ======================== onboarding ======================== */
 function obSteps(){
   const order=['lesson','setup','team'];
-  const names={lesson:'บทเรียนก่อนเลือกรูปแบบ',setup:'ประเภทโครงงานและรูปแบบการจัด',team:'สมาชิกและครูผู้สอน'};
+  const names={lesson:'บทเรียนก่อนเลือกรูปแบบ',setup:'ประเภทโครงงาน',team:'สมาชิกและครูผู้สอน'};
   const cur=order.indexOf(S.ob==='quiz'?'lesson':S.ob);
   return `<div class="ob-steps">${order.map((k,i)=>`<span class="${i===cur?'on':i<cur?'ok':''}">${names[k]}</span>`).join('')}</div>`;
 }
@@ -579,23 +579,13 @@ function viewLesson(){
 function unitsFromGroup(g){return (g&&g.units&&g.units.length)?g.units:[{no:'1',name:'',pbl:false},{no:'2',name:'',pbl:false},{no:'3',name:'',pbl:false}]}
 function viewSetup(first){
   const g=S.data.bundle?S.data.bundle.group:{};
-  if(!S.units) S.units=JSON.parse(JSON.stringify(unitsFromGroup(g)));
   return `<section class="stack" style="gap:22px">
-   ${first?`<div class="stack"><div class="eyebrow">ขั้นที่ 2 ของการตั้งกลุ่ม</div><h1>เลือกประเภทโครงงานและรูปแบบการจัด</h1></div>`:'<h2>ข้อมูลโครงงาน</h2>'}
+   ${first?`<div class="stack"><div class="eyebrow">ขั้นที่ 2 ของการตั้งกลุ่ม</div><h1>เลือกประเภทโครงงาน</h1></div>`:'<h2>ข้อมูลโครงงาน</h2>'}
    <div class="card stack"><h3>ประเภทโครงงาน</h3>
     <div class="types">${PROJECT_TYPES.map((t,i)=>`<label class="type"><input type="radio" name="ptype" value="${e(t.id)}" ${g.project_type===t.id?'checked':''}><span><b>${e(t.id)}</b><span class="small muted">${e(t.d)}</span></span></label>`).join('')}</div>
     <div class="field"><label for="pName">ชื่อโครงงาน (ใส่ชื่อชั่วคราวได้ แก้ไขภายหลังได้)</label><input class="input" id="pName" value="${e(g.project_name||'')}" placeholder="เช่น เครื่องรดน้ำผักอัตโนมัติด้วยเซนเซอร์ความชื้นในดิน"></div>
-   </div>
-   <div class="card stack"><div class="row"><h3 class="grow">รูปแบบการจัด</h3><span class="tag pbl">รูปแบบที่ 3</span></div>
-    <p class="small muted">จัดเฉพาะบางหน่วยการเรียนรู้: ใส่หน่วยของรายวิชา แล้วเลือกหน่วยที่จัดแบบโครงงาน หน่วยที่ไม่เลือกจะสอนตามปกติ</p>
     <div class="grid2"><div class="field"><label for="sCode">รหัสวิชา</label><input class="input mono" id="sCode" value="${e(g.subject_code||'')}" placeholder="เช่น 20104-2005"></div>
     <div class="field"><label for="sName">ชื่อวิชา</label><input class="input" id="sName" value="${e(g.subject_name||'')}" placeholder="เช่น เครื่องมือวัดไฟฟ้า"></div></div>
-    <div class="units" id="units">${S.units.map((u,i)=>`<div class="unit">
-      <input class="input" id="uNo${i}" value="${e(u.no)}" aria-label="หน่วยที่" placeholder="หน่วย">
-      <input class="input" id="uName${i}" value="${e(u.name)}" aria-label="ชื่อหน่วย" placeholder="ชื่อหน่วยการเรียนรู้">
-      <label class="toggle"><input type="checkbox" id="uPbl${i}" ${u.pbl?'checked':''}>จัดแบบโครงงาน</label>
-      <button class="btn ghost sm" data-a="delUnit" data-i="${i}" aria-label="ลบหน่วย">ลบ</button></div>`).join('')}</div>
-    <div><button class="btn sm" data-a="addUnit">+ เพิ่มหน่วย</button></div>
    </div>
    <div class="row"><button class="btn primary" data-a="saveSetup">${first?'บันทึกและไปขั้นเลือกสมาชิก':'บันทึกข้อมูลโครงงาน'}</button></div>
   </section>`;
@@ -671,7 +661,6 @@ function statusChips(r,cp){
 }
 function viewStudent(){
   const b=S.data.bundle, g=b.group, sum=b.summary;
-  const pblUnits=(g.units||[]).filter(u=>u.pbl);
   const tabs=[['R','ทำโครงงาน 11 ขั้น'],['D','เล่มรายงาน (Word)'],['G','ข้อมูลกลุ่ม']];
   const dst=docStatus(b);
   const revise=b.progress.filter(r=>r.review_status==='revise').length;
@@ -680,7 +669,6 @@ function viewStudent(){
       <div class="eyebrow">กลุ่ม <span class="mono">${e(g.group_id)}</span> · โครงงาน${e(g.project_type)}</div>
       <h1>${e(g.project_name||'ยังไม่ได้ตั้งชื่อโครงงาน')}</h1>
       <div class="meta"><span>รายวิชา <b>${e([g.subject_code,g.subject_name].filter(Boolean).join(' ')||'—')}</b></span><span>ครูผู้สอน <b>${e(b.teacher?b.teacher.name:'—')}</b></span><span>สมาชิก <b>${b.members.map(m=>e(m.name)).join(', ')}</b></span></div>
-      <div class="row" style="gap:6px">${pblUnits.map(u=>`<span class="tag pbl">หน่วยที่ ${e(u.no)} ${e(u.name)}</span>`).join('')}<span class="small muted">${(g.units||[]).length-pblUnits.length>0?'หน่วยอื่นอีก '+((g.units||[]).length-pblUnits.length)+' หน่วยเรียนตามปกติ':''}</span></div>
     </div>
     <div class="meters">
       <div><div class="lbl"><span>ทำโครงงาน 11 ขั้น</span><span class="pct">${sum.rPct}%</span></div><div class="meter amber"><i style="width:${sum.rPct}%"></i></div><div class="small muted">${sum.R}/${sum.rTotal} ขั้น</div></div>
@@ -999,7 +987,7 @@ function viewTeacherGroup(){
   return `<div class="band"><div class="wrap"><div class="stack" style="gap:8px;min-width:0">
     <div class="row"><button class="btn ghost sm" data-a="tback">← กลับรายการกลุ่ม</button><span class="spacer"></span><button class="btn sm" data-a="ddownload">ดาวน์โหลดเล่มรายงาน (.docx)</button></div>
     <div class="eyebrow">กลุ่ม <span class="mono">${e(g.group_id)}</span> · โครงงาน${e(g.project_type)}</div><h1>${e(g.project_name||'(ยังไม่ตั้งชื่อ)')}</h1>
-    <div class="meta"><span>รายวิชา <b>${e([g.subject_code,g.subject_name].filter(Boolean).join(' '))}</b></span><span>หน่วยที่จัดแบบโครงงาน <b>${e((g.units||[]).filter(u=>u.pbl).map(u=>u.no+' '+u.name).join(', ')||'—')}</b></span></div></div>
+    <div class="meta"><span>รายวิชา <b>${e([g.subject_code,g.subject_name].filter(Boolean).join(' '))}</b></span></div></div>
     <div class="meters"><div><div class="lbl"><span>ทำโครงงาน 11 ขั้น</span><span class="pct">${b.summary.rPct}%</span></div><div class="meter amber"><i style="width:${b.summary.rPct}%"></i></div></div>
     <div><div class="lbl"><span>เนื้อหาเล่มรายงาน</span><span class="pct">${docPct(b)}%</span></div><div class="meter"><i style="width:${docPct(b)}%"></i></div></div></div>
   </div><div class="wrap"><nav class="tabs">${tabs.map(([k,l])=>`<button class="${S.tTab===k?'on':''}" data-a="ttab" data-v="${k}">${l}${k==='R'&&pendR?`<span class="count">${pendR}</span>`:''}</button>`).join('')}</nav></div></div>
@@ -1113,9 +1101,7 @@ const HANDLERS={
     keepUnits();
     const type=(document.querySelector('input[name="ptype"]:checked')||{}).value;
     if(!type){toast('กรุณาเลือกประเภทโครงงาน',true);return}
-    const units=S.units.filter(u=>u.name);
-    if(!units.some(u=>u.pbl)){toast('เลือกหน่วยที่จัดแบบโครงงานอย่างน้อย 1 หน่วย',true);return}
-    const p={project_type:type,project_name:val('pName'),subject_code:val('sCode'),subject_name:val('sName'),units,lesson_done:true};
+    const p={project_type:type,project_name:val('pName'),subject_code:val('sCode'),subject_name:val('sName'),lesson_done:true};
     act(async()=>{const d=await call('saveSetup',p);toast('บันทึกข้อมูลโครงงานแล้ว');S.units=null;if(S.view==='onboard'){S.ob='team';S.data=d;render();window.scrollTo(0,0)}else{S.data=d;render()}});
   },
   lookup(){const id=val('mId');if(!id)return;act(async()=>{const r=await call('lookupStudent',{student_id:id});S.lookup=Object.assign({id},r);render();setTimeout(()=>$('mName')&&$('mName').focus(),0)})},
