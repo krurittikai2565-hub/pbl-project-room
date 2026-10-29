@@ -8,6 +8,7 @@
  *  3) เลือกฟังก์ชัน setupSheets แล้วกด Run หนึ่งครั้ง (อนุญาตสิทธิ์)
  *  4) ทำให้ใช้งานได้ > การทำให้ใช้งานได้รายการใหม่ > เว็บแอป
  *     ดำเนินการในฐานะ: ฉัน | ผู้มีสิทธิ์เข้าถึง: ทุกคน
+ *  5) (ถ้าใช้หน้าเว็บบน GitHub Pages) นำ URL ที่ลงท้ายด้วย /exec ไปใส่ใน docs/config.js
  */
 
 var SHEET_ID = '1ilNfGxlgNwWVAMvf8M8RRh5FqHnLqxqZ-c1_Xc2tgRw';
@@ -21,6 +22,14 @@ function doGet() {
     .setTitle(APP_TITLE)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/** รับคำขอจากหน้าเว็บที่โฮสต์ภายนอก (เช่น GitHub Pages) ส่ง JSON {action, payload, token} */
+function doPost(e) {
+  var body = {};
+  try { body = JSON.parse((e && e.postData && e.postData.contents) || '{}'); } catch (x) {}
+  var res = api(body.action, body.payload, body.token);
+  return ContentService.createTextOutput(JSON.stringify(res)).setMimeType(ContentService.MimeType.JSON);
 }
 
 /** จุดเรียกเดียวจากหน้าเว็บ: google.script.run.api(action, payload, token) */
@@ -424,9 +433,11 @@ var Core = (function () {
       saveProgress: function (p, sess) {
         var gid = requireGroup(sess);
         var track = s(p.track), step = s(p.step), sub = s(p.sub || '0'), status = s(p.status);
-        if (track !== 'P' && track !== 'R') fail('เส้นทางไม่ถูกต้อง');
+        if (track !== 'P' && track !== 'R' && track !== 'D') fail('เส้นทางไม่ถูกต้อง');
         if (!STATUSES[status]) fail('สถานะไม่ถูกต้อง');
-        var patch = { status: status, work: s(p.work, 20000), link: s(p.link, 500), updated_by: sess.id, updated_at: env.now() };
+        // D = เนื้อหาเล่มรายงานสำหรับดาวน์โหลด Word (1 ช่องของ Google Sheet เก็บได้ไม่เกิน 50,000 ตัวอักษร)
+        if (String(p.work || '').length > 45000) fail('ข้อความยาวเกิน 45,000 ตัวอักษร กรุณาแบ่งเนื้อหาหรือย้ายบางส่วนไปภาคผนวก');
+        var patch = { status: status, work: s(p.work, 45000), link: s(p.link, 500), updated_by: sess.id, updated_at: env.now() };
         if (status === 'submitted') patch.review_status = 'pending';
         var match = function (o) { return o.group_id === gid && o.track === track && o.step === step && o.sub === sub; };
         var ex = db.all('progress').filter(match)[0];

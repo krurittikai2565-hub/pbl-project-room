@@ -117,8 +117,6 @@ textarea.input{min-height:120px;resize:vertical;line-height:1.6}
 .seg{display:flex;background:var(--sunk);padding:4px;border-radius:10px;gap:4px}
 .seg button{flex:1;border:0;background:transparent;padding:8px 6px;border-radius:7px;font-weight:600;cursor:pointer;color:var(--muted)}
 .seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.1)}
-.demo-ids{font-size:.85rem;color:var(--muted)}
-.demo-ids button{border:0;background:var(--sunk);border-radius:6px;padding:1px 7px;cursor:pointer;font-family:var(--f-mono);font-size:.82rem;color:var(--ink)}
 
 /* onboarding */
 .ob{padding-block:32px;display:flex;flex-direction:column;gap:24px}
@@ -229,8 +227,6 @@ textarea.input{min-height:120px;resize:vertical;line-height:1.6}
 #toast div{background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:500;box-shadow:var(--shadow);animation:pop .2s ease-out}
 #toast div.err{background:var(--danger);color:#fff}
 @keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
-.demo-banner{background:var(--amber-soft);color:var(--ink);font-size:.85rem;border-bottom:1px solid var(--line)}
-.demo-banner .wrap{padding-block:6px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
 @media (max-width:900px){
   .login{grid-template-columns:1fr;padding-block:28px;gap:28px}
@@ -256,12 +252,12 @@ textarea.input{min-height:120px;resize:vertical;line-height:1.6}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
-<div id="demo"></div>
 <div id="busy" class="busybar" hidden></div>
 <div id="app"></div>
 <div id="toast" aria-live="polite"></div>
 
-<!--PREVIEW_MOCK-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<!--TEST_HOOK-->
 
 <script>
 /* ======================== เนื้อหาตามคู่มือ ======================== */
@@ -389,15 +385,21 @@ const store = {
   set(k,v){try{v?sessionStorage.setItem(k,v):sessionStorage.removeItem(k)}catch(e){}}
 };
 
+const API_URL=String(window.PBL_API_URL||'').trim();
+const IN_GAS=!!(window.google&&google.script&&google.script.run);
 function call(action,payload){
   return new Promise((resolve,reject)=>{
     busy(true);
     const done=r=>{busy(false); if(r&&r.ok) resolve(r.data); else { const m=(r&&r.error)||'เกิดข้อผิดพลาด'; if(m.indexOf('SESSION:')===0){ logoutLocal(); toast(m.slice(8).trim(),true); } reject(new Error(m.replace(/^SESSION:\s*/,''))); } };
     if(window.google&&google.script&&google.script.run){
       google.script.run.withSuccessHandler(done).withFailureHandler(e=>{busy(false);reject(new Error(e&&e.message||'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้'))}).api(action,payload||{},S.token);
-    } else if(window.MockServer){
-      setTimeout(()=>done(window.MockServer.api(action,payload||{},S.token)),120);
-    } else { busy(false); reject(new Error('ไม่พบเซิร์ฟเวอร์ (ต้องเปิดผ่าน Google Apps Script)')); }
+    } else if(window.PBL_TEST_SERVER){
+      setTimeout(()=>done(window.PBL_TEST_SERVER.api(action,payload||{},S.token)),30);
+    } else if(API_URL){
+      fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,payload:payload||{},token:S.token}),redirect:'follow'})
+        .then(r=>r.json()).then(done)
+        .catch(()=>{busy(false);reject(new Error('เชื่อมต่อฐานข้อมูลไม่ได้ ตรวจสอบอินเทอร์เน็ต หรือ URL ของ Apps Script ใน config.js'))});
+    } else { busy(false); reject(new Error('ยังไม่ได้เชื่อมต่อฐานข้อมูล: ใส่ URL ของ Apps Script ในไฟล์ docs/config.js')); }
   });
 }
 let busyN=0;
@@ -436,7 +438,6 @@ async function routeStudent(data){
   render();
 }
 async function boot(){
-  if(window.MockServer) showDemoBanner();
   const t=store.get('pbl3_token');
   if(!t){render();return}
   S.token=t;
@@ -485,7 +486,7 @@ function viewLogin(){
       <input class="input mono" id="loginId" inputmode="${isT?'text':'numeric'}" autocomplete="username" placeholder="${isT?'เช่น T001':'เช่น 66201010001'}"></div>
       <button class="btn primary" data-a="login">เข้าสู่ระบบ</button>
       <p class="small muted">${isT?'ครูจะเห็นเฉพาะกลุ่มที่เลือกท่านเป็นครูผู้สอน':'สมาชิกคนใดในกลุ่มก็เข้าด้วยรหัสของตนเองได้ ทุกคนเห็นงานของกลุ่มเดียวกัน'}</p>
-      ${window.MockServer?`<p class="demo-ids">ลองรหัสตัวอย่าง: ${isT?'<button data-a="fill" data-v="T001">T001</button>':'<button data-a="fill" data-v="66201010001">66201010001</button> (มีกลุ่มแล้ว) · <button data-a="fill" data-v="66201010099">66201010099</button> (ผู้ใช้ใหม่)'}</p>`:''}`;
+`;
   }
   return `<main class="wrap login">
     <section class="login-intro">
@@ -506,6 +507,7 @@ function viewLogin(){
         <button class="${tab==='teacher'?'on':''}" data-a="ltab" data-v="teacher">ครูผู้สอน</button>
         <button class="${tab==='admin'?'on':''}" data-a="ltab" data-v="admin">ผู้ดูแล</button>
       </div>
+      ${!IN_GAS&&!API_URL&&!window.PBL_TEST_SERVER?'<div class="note danger">ยังไม่ได้เชื่อมต่อฐานข้อมูล ผู้ดูแลต้องใส่ URL ของ Google Apps Script ในไฟล์ <span class="mono">docs/config.js</span> ก่อนใช้งาน</div>':''}
       <form class="stack" id="loginForm" onsubmit="return false">${form}</form>
     </section>
   </main>`;
@@ -662,7 +664,7 @@ function statusChips(r,cp){
 function viewStudent(){
   const b=S.data.bundle, g=b.group, sum=b.summary;
   const pblUnits=(g.units||[]).filter(u=>u.pbl);
-  const tabs=[['P','ทำโครงงาน 6 ขั้น'],['R','เขียนเล่มรายงาน 11 ขั้น'],['G','ข้อมูลกลุ่ม']];
+  const tabs=[['P','ทำโครงงาน 6 ขั้น'],['R','เขียนเล่มรายงาน 11 ขั้น'],['D','เล่มรายงาน (Word)'],['G','ข้อมูลกลุ่ม']];
   const revise=b.progress.filter(r=>r.review_status==='revise').length;
   return `<div class="band"><div class="wrap">
     <div class="stack" style="gap:8px;min-width:0">
@@ -677,7 +679,7 @@ function viewStudent(){
       ${revise?`<div class="note danger small">ครูส่งกลับให้แก้ไข ${revise} รายการ</div>`:''}
     </div>
   </div><div class="wrap"><nav class="tabs">${tabs.map(([k,l])=>`<button class="${S.tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</nav></div></div>
-  <main class="wrap">${S.tab==='P'?viewTrackP(b,false):S.tab==='R'?viewTrackR(b,false):viewGroupInfo()}</main>`;
+  <main class="wrap">${S.tab==='P'?viewTrackP(b,false):S.tab==='R'?viewTrackR(b,false):S.tab==='D'?viewDoc(b):viewGroupInfo()}</main>`;
 }
 function viewGroupInfo(){
   return `<div class="section">${viewSetup(false)}<h2>สมาชิกและครูผู้สอน</h2>${viewTeam(false)}</div>`;
@@ -748,6 +750,196 @@ function taskCard(track,step,sub,label,title,desc,prompt,cp,m,teacher,teacherTas
 }
 function safeUrl(u){return /^https?:\/\//i.test(u)?u:'#'}
 
+/* ======================== เล่มรายงาน (Word) ======================== */
+const DOC_SECTIONS=[
+ {id:1,t:'บทคัดย่อ',from:[8],hint:'สรุปวัตถุประสงค์ วิธีดำเนินงาน และผลสำคัญ (ตัวเลขจริง) ไม่เกิน 250 คำ ปิดท้ายด้วยบรรทัด คำสำคัญ: ...',
+  tpl:'โครงงานนี้มีวัตถุประสงค์เพื่อ ...\n\nวิธีดำเนินงาน ...\n\nผลการดำเนินงานพบว่า ...\n\n**คำสำคัญ:** ...'},
+ {id:2,t:'กิตติกรรมประกาศ',hint:'ขอบคุณครูที่ปรึกษา ผู้ให้ข้อมูล สถานประกอบการ หรือผู้ที่ช่วยเหลือ',
+  tpl:'โครงงานเรื่อง [ชื่อโครงงาน] สำเร็จลุล่วงได้ด้วยความกรุณาจาก [ครูที่ปรึกษา] ที่ให้คำแนะนำและตรวจแก้ไขตลอดการทำโครงงาน\n\nขอขอบคุณ ...\n\nคณะผู้จัดทำหวังว่าโครงงานนี้จะเป็นประโยชน์ต่อผู้ที่สนใจ'},
+ {id:3,chapter:1,title:'บทนำ',from:[3],
+  tpl:'## 1.1 ความเป็นมาและความสำคัญของปัญหา\n\n## 1.2 วัตถุประสงค์ของโครงงาน\n1. เพื่อ ...\n2. เพื่อ ...\n\n## 1.3 ขอบเขตของโครงงาน\n\n## 1.4 นิยามศัพท์เฉพาะ\n\n## 1.5 ประโยชน์ที่คาดว่าจะได้รับ\n'},
+ {id:4,chapter:2,title:'เอกสารและงานวิจัยที่เกี่ยวข้อง',from:[2,3],
+  tpl:'## 2.1 ...\n\n## 2.2 ...\n\n## 2.3 งานวิจัยที่เกี่ยวข้อง\n'},
+ {id:5,chapter:3,title:'วิธีดำเนินโครงงาน',from:[3],
+  tpl:'## 3.1 ขั้นตอนการดำเนินงาน\n\n## 3.2 เครื่องมือ วัสดุ และอุปกรณ์\n\n## 3.3 การเก็บรวบรวมข้อมูล\n\n## 3.4 การวิเคราะห์ข้อมูลและสถิติที่ใช้\n\n## 3.5 แผนการดำเนินงาน\n'},
+ {id:6,chapter:4,title:'ผลการดำเนินโครงงาน',from:[5,6],
+  tpl:'## 4.1 ผลการ ... (ตามวัตถุประสงค์ข้อที่ 1)\n\n| รายการ | ผลที่ได้ |\n|---|---|\n|  |  |\n\n## 4.2 ผลการ ... (ตามวัตถุประสงค์ข้อที่ 2)\n'},
+ {id:7,chapter:5,title:'สรุปผล อภิปรายผล และข้อเสนอแนะ',from:[7],
+  tpl:'## 5.1 สรุปผลการดำเนินโครงงาน\n\n## 5.2 อภิปรายผล\n\n## 5.3 ข้อจำกัดของโครงงาน\n\n## 5.4 ข้อเสนอแนะ\n'},
+ {id:8,t:'บรรณานุกรม',from:[9],biblio:true,hint:'1 บรรทัดต่อ 1 รายการ รูปแบบ APA 7 เรียงตามตัวอักษร (ภาษาไทยก่อน แล้วตามด้วยภาษาอังกฤษ)'},
+ {id:9,t:'ภาคผนวก',optional:true,hint:'ไม่บังคับ: แบบสอบถาม ตารางข้อมูลดิบ คู่มือการใช้งาน ภาพประกอบการทำงาน (ใส่เป็นคำอธิบาย/ลิงก์)'}
+];
+const secTitle=s=>s.chapter?`บทที่ ${s.chapter} ${s.title}`:s.t;
+function docInfo(b){const r=pmap(b.progress)['D-0-0'];try{return JSON.parse((r&&r.work)||'{}')}catch(err){return {}}}
+function defaultYear(){const d=new Date();return String(d.getFullYear()+(d.getMonth()>=4?543:542))}
+function defaultTerm(){const m=new Date().getMonth();return m>=4&&m<=9?'1':'2'}
+function docStatus(b){
+  const m=pmap(b.progress);
+  const has=id=>{const r=m['D-'+id+'-0'];return !!(r&&r.work&&r.work.trim())};
+  const chapters=DOC_SECTIONS.filter(s=>s.chapter);
+  const chDone=chapters.filter(s=>has(s.id)).length;
+  const reqDone=DOC_SECTIONS.filter(s=>!s.optional&&has(s.id)).length, reqTotal=DOC_SECTIONS.filter(s=>!s.optional).length;
+  const rDone=b.summary.R, rTotal=b.summary.rTotal;
+  return {has,chDone,chTotal:chapters.length,reqDone,reqTotal,rDone,rTotal,complete:reqDone===reqTotal&&rDone===rTotal};
+}
+function viewDoc(b){
+  const m=pmap(b.progress), info=docInfo(b), st=docStatus(b);
+  return `<div class="section">
+   <div class="step-head"><div class="step-no">W</div><div class="stack" style="gap:4px"><div class="eyebrow">เล่มรายงานโครงงาน 5 บท · รูปแบบรายงานการวิจัย</div><h2>รวมเล่มและดาวน์โหลดเป็นไฟล์ Word</h2>
+    <span class="small muted">เขียนหรือวางเนื้อหาที่ตรวจแล้วในแต่ละส่วน ระบบจัดรูปแบบให้: ปก บทคัดย่อ กิตติกรรมประกาศ สารบัญ บทที่ 1–5 บรรณานุกรม ภาคผนวก ฟอนต์ TH Sarabun New 16 pt กระดาษ A4</span></div></div>
+   <div class="card stack">
+    <div class="row" style="align-items:flex-start;gap:20px">
+     <div class="grow stack" style="gap:10px;min-width:220px">
+      <div><div class="lbl small" style="display:flex;justify-content:space-between;font-weight:600"><span>เขียนเล่มรายงาน 11 ขั้น</span><span class="pct">${st.rDone}/${st.rTotal}</span></div><div class="meter amber"><i style="width:${Math.round(st.rDone*100/st.rTotal)}%"></i></div></div>
+      <div><div class="lbl small" style="display:flex;justify-content:space-between;font-weight:600"><span>เนื้อหาเล่ม (ส่วนที่ต้องมี)</span><span class="pct">${st.reqDone}/${st.reqTotal}</span></div><div class="meter"><i style="width:${Math.round(st.reqDone*100/st.reqTotal)}%"></i></div></div>
+     </div>
+     <div class="stack" style="gap:8px;align-items:flex-start">
+      <button class="btn primary" data-a="ddownload">${st.complete?'ดาวน์โหลดเล่มฉบับสมบูรณ์ (.docx)':'ดาวน์โหลดฉบับร่าง (.docx)'}</button>
+      <span class="small muted" style="max-width:34ch">${st.complete?'ทำครบทุกขั้นแล้ว เปิดไฟล์ใน Word แล้วกด “ใช่” เพื่ออัปเดตสารบัญ':'ยังไม่ครบ ไฟล์จะระบุว่า “ฉบับร่าง” ส่วนที่ยังไม่เขียนจะแสดงเป็น [ยังไม่ได้เขียน]'}</span>
+     </div>
+    </div>
+   </div>
+   <div class="card stack"><h3>ข้อมูลหน้าปก</h3>
+    <div class="grid2"><div class="field"><label for="dCollege">ชื่อสถานศึกษา</label><input class="input" id="dCollege" value="${e(info.college||'')}" placeholder="เช่น วิทยาลัยเทคนิค..."></div>
+     <div class="field"><label for="dDept">แผนกวิชา / สาขาวิชา</label><input class="input" id="dDept" value="${e(info.dept||'')}" placeholder="เช่น แผนกวิชาช่างไฟฟ้ากำลัง"></div>
+     <div class="field"><label for="dTerm">ภาคเรียนที่</label><select class="input" id="dTerm">${['1','2','ฤดูร้อน'].map(t=>`<option ${String(info.term||defaultTerm())===t?'selected':''}>${t}</option>`).join('')}</select></div>
+     <div class="field"><label for="dYear">ปีการศึกษา</label><input class="input mono" id="dYear" inputmode="numeric" value="${e(info.year||defaultYear())}"></div></div>
+    <div><button class="btn" data-a="dinfo">บันทึกข้อมูลหน้าปก</button></div>
+   </div>
+   <div class="note info small">พิมพ์ได้ตามปกติ 1 บรรทัด = 1 ย่อหน้า · <b>## 1.1 หัวข้อ</b> = หัวข้อย่อย · <b>- </b> = รายการ · <b>| ก | ข |</b> = ตาราง · <b>**ข้อความ**</b> = ตัวหนา (รูปแบบเดียวกับคำตอบจาก AI จึงวางต่อได้ทันที)</div>
+   <div class="tasks">${DOC_SECTIONS.map(sec=>docCard(sec,m,st)).join('')}</div>
+  </div>`;
+}
+function docCard(sec,m,st){
+  const key='D-'+sec.id+'-0', r=m[key], open=S.dOpen===key, d=S.drafts[key]||{};
+  const work=d.work!=null?d.work:(r?r.work:'');
+  const filled=st.has(sec.id);
+  let body='';
+  if(open){
+    const pulls=(sec.from||[]).map(n=>`<button class="btn sm" data-a="dpull" data-k="${key}" data-v="${n}">ดึงข้อความจากขั้นที่ ${n} (เขียนเล่ม 11 ขั้น)</button>`).join('');
+    body=`<div class="task-b">
+      ${sec.hint?`<p class="muted">${e(sec.hint)}</p>`:''}
+      <div class="row">${sec.tpl?`<button class="btn sm" data-a="dtpl" data-k="${key}">ใส่หัวข้อมาตรฐาน</button>`:''}${pulls}</div>
+      <div class="field"><label for="w-${key}">เนื้อหา${e(secTitle(sec))} <span class="muted" id="cnt-${key}">${work.length.toLocaleString()} / 45,000 ตัวอักษร</span></label>
+      <textarea class="input" id="w-${key}" data-draft="${key}" style="min-height:${sec.chapter?320:180}px">${e(work)}</textarea></div>
+      <div class="row"><span class="small muted">${r?'บันทึกล่าสุด '+e(r.updated_at):''}</span><span class="spacer"></span><button class="btn primary" data-a="dsave" data-k="${key}">บันทึก</button></div>
+    </div>`;
+  }
+  return `<article class="task ${open?'open':''}" id="task-${key}">
+    <button class="task-h" data-a="dopen" data-k="${key}" aria-expanded="${open}"><span class="k">${sec.chapter?'บท '+sec.chapter:'—'}</span><span class="tt">${e(sec.chapter?sec.title:sec.t)}</span>
+    <span class="chips">${filled?'<span class="chip st-done">เขียนแล้ว</span>':sec.optional?'<span class="chip st-todo">ไม่บังคับ</span>':'<span class="chip st-todo">ยังไม่ได้เขียน</span>'}</span></button>${body}</article>`;
+}
+
+/* ---------- สร้างไฟล์ .docx (Office Open XML) ---------- */
+const DOCX={
+  W:'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"',
+  TEXT_W:8306,
+  x(s){return String(s==null?'':s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g,'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')},
+  runs(text,o){o=o||{};return String(text).split(/(\*\*[^*]+\*\*)/g).filter(p=>p!=='').map(p=>{const bold=/^\*\*[^*]+\*\*$/.test(p);const t=bold?p.slice(2,-2):p;
+    const rpr=(bold||o.b?'<w:b/><w:bCs/>':'')+(o.sz?`<w:sz w:val="${o.sz}"/><w:szCs w:val="${o.sz}"/>`:'');
+    return `<w:r>${rpr?`<w:rPr>${rpr}</w:rPr>`:''}<w:t xml:space="preserve">${DOCX.x(t)}</w:t></w:r>`}).join('')},
+  p(text,o){o=o||{};let ppr='';if(o.style)ppr+=`<w:pStyle w:val="${o.style}"/>`;if(o.pb)ppr+='<w:pageBreakBefore/>';if(o.jc)ppr+=`<w:jc w:val="${o.jc}"/>`;
+    return `<w:p>${ppr?`<w:pPr>${ppr}</w:pPr>`:''}${text?DOCX.runs(text,o):''}</w:p>`},
+  blank(n){return Array.from({length:n},()=>'<w:p/>').join('')},
+  h1(lines,pb){return `<w:p><w:pPr><w:pStyle w:val="Heading1"/>${pb?'<w:pageBreakBefore/>':''}</w:pPr>${lines.map((l,i)=>(i?'<w:r><w:br/></w:r>':'')+`<w:r><w:t xml:space="preserve">${DOCX.x(l)}</w:t></w:r>`).join('')}</w:p>`},
+  table(rows){const n=Math.max.apply(null,rows.map(r=>r.length));const w=Math.floor(DOCX.TEXT_W/n);
+    return `<w:tbl><w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:w="${w*n}" w:type="dxa"/><w:jc w:val="center"/></w:tblPr><w:tblGrid>${'<w:gridCol w:w="'+w+'"/>'.repeat(n)}</w:tblGrid>`+
+      rows.map((r,ri)=>`<w:tr>${ri===0?'<w:trPr><w:tblHeader/></w:trPr>':''}${Array.from({length:n},(_,ci)=>`<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/></w:tcPr>${DOCX.p(r[ci]||'',{style:'TableText',jc:ri===0?'center':null,b:ri===0})}</w:tc>`).join('')}</w:tr>`).join('')+'</w:tbl><w:p/>'},
+  md(text,kind){
+    const lines=String(text||'').replace(/\r/g,'').split('\n');let out='',i=0;
+    while(i<lines.length){
+      const t=lines[i].trim();
+      if(!t){i++;continue}
+      if(t.charAt(0)==='|'){const rows=[];while(i<lines.length&&lines[i].trim().charAt(0)==='|'){const r=lines[i].trim();if(r.replace(/[|:\-\s]/g,'')!=='')rows.push(r.replace(/^\||\|$/g,'').split('|').map(c=>c.trim()));i++}if(rows.length)out+=DOCX.table(rows);continue}
+      i++;
+      const clean=t.replace(/^>\s*/,'');
+      const hm=clean.match(/^(#{1,6})\s+(.*)$/);
+      if(hm){out+=DOCX.p(hm[2].replace(/\*\*/g,''),{style:hm[1].length>=3?'Heading3':'Heading2'});continue}
+      if(kind==='biblio'){out+=DOCX.p(clean.replace(/^[-*•]\s+|^\d+[.)]\s+/,''),{style:'Biblio'});continue}
+      if(clean.length<90&&/^\d+\.\d+\.\d+\s+\S/.test(clean)){out+=DOCX.p(clean.replace(/\*\*/g,''),{style:'Heading3'});continue}
+      if(clean.length<90&&/^\d+\.\d+\s+\S/.test(clean)){out+=DOCX.p(clean.replace(/\*\*/g,''),{style:'Heading2'});continue}
+      const bm=clean.match(/^[-*•]\s+(.*)$/);
+      if(bm){out+=DOCX.p('•\t'+bm[1],{style:'ListBody'});continue}
+      if(/^\d+[.)]\s+/.test(clean)){out+=DOCX.p(clean.replace(/^(\d+)[.)]\s+/,'$1.\t'),{style:'ListBody'});continue}
+      out+=DOCX.p(clean,{style:'Body'});
+    }
+    return out;
+  },
+  sect(o){return `<w:sectPr><w:headerReference w:type="default" r:id="rIdH1"/>${o.titlePg?'<w:headerReference w:type="first" r:id="rIdH2"/>':''}<w:type w:val="nextPage"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="2160" w:right="1440" w:bottom="1440" w:left="2160" w:header="720" w:footer="720" w:gutter="0"/><w:pgNumType w:fmt="${o.fmt}" w:start="1"/>${o.titlePg?'<w:titlePg/>':''}</w:sectPr>`},
+  styles(){
+    const F='TH Sarabun New';
+    const ps=(id,name,ppr,rpr,extra)=>`<w:style w:type="paragraph" w:styleId="${id}"><w:name w:val="${name}"/><w:basedOn w:val="Normal"/>${extra||''}<w:qFormat/>${ppr?`<w:pPr>${ppr}</w:pPr>`:''}${rpr?`<w:rPr>${rpr}</w:rPr>`:''}</w:style>`;
+    const B='<w:b/><w:bCs/>', SZ=n=>`<w:sz w:val="${n}"/><w:szCs w:val="${n}"/>`, bd=k=>`<w:${k} w:val="single" w:sz="4" w:space="0" w:color="000000"/>`;
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles ${DOCX.W}>
+<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="${F}" w:hAnsi="${F}" w:eastAsia="${F}" w:cs="${F}"/>${SZ(32)}<w:lang w:val="th-TH" w:eastAsia="en-US" w:bidi="th-TH"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>
+<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style>
+${ps('Heading1','heading 1','<w:keepNext/><w:spacing w:after="360"/><w:jc w:val="center"/><w:outlineLvl w:val="0"/>',B+SZ(40),'<w:next w:val="Body"/>')}
+${ps('Heading2','heading 2','<w:keepNext/><w:spacing w:before="240" w:after="60"/><w:outlineLvl w:val="1"/>',B+SZ(36),'<w:next w:val="Body"/>')}
+${ps('Heading3','heading 3','<w:keepNext/><w:spacing w:before="120" w:after="0"/><w:ind w:left="360"/><w:outlineLvl w:val="2"/>',B+SZ(32),'<w:next w:val="Body"/>')}
+${ps('Body','Body Text Thai','<w:ind w:firstLine="720"/><w:jc w:val="thaiDistribute"/>','')}
+${ps('ListBody','List Thai','<w:tabs><w:tab w:val="left" w:pos="1080"/></w:tabs><w:ind w:left="1080" w:hanging="360"/>','')}
+${ps('Biblio','Bibliography Thai','<w:ind w:left="720" w:hanging="720"/>','')}
+${ps('TableText','Table Text Thai','','')}
+${ps('CoverTitle','Cover Title','<w:jc w:val="center"/>',B+SZ(44))}
+${ps('TocTitle','TOC Title','<w:spacing w:after="360"/><w:jc w:val="center"/>',B+SZ(40))}
+${ps('TOC1','toc 1','<w:tabs><w:tab w:val="right" w:leader="dot" w:pos="8296"/></w:tabs><w:spacing w:before="60"/>','')}
+${ps('TOC2','toc 2','<w:tabs><w:tab w:val="right" w:leader="dot" w:pos="8296"/></w:tabs><w:ind w:left="360"/>','')}
+<w:style w:type="table" w:styleId="TableGrid"><w:name w:val="Table Grid"/><w:tblPr><w:tblBorders>${bd('top')}${bd('left')}${bd('bottom')}${bd('right')}${bd('insideH')}${bd('insideV')}</w:tblBorders><w:tblCellMar><w:left w:w="108" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style>
+</w:styles>`;
+  }
+};
+function buildDocument(b){
+  const m=pmap(b.progress), info=docInfo(b), g=b.group, st=docStatus(b), D=DOCX;
+  const get=id=>{const r=m['D-'+id+'-0'];return r&&r.work&&r.work.trim()?r.work:''};
+  const fill=t=>t.replace(/\[ชื่อโครงงาน\]/g,g.project_name||'').replace(/\[ครูที่ปรึกษา\]/g,b.teacher?b.teacher.name:'ครูที่ปรึกษา');
+  const missing=t=>D.p(`[ยังไม่ได้เขียน${t}]`,{style:'Body'});
+  const year=info.year||defaultYear(), term=info.term||defaultTerm();
+  const subject=[g.subject_code,g.subject_name].filter(Boolean).join(' ');
+  const C=(t,o)=>D.p(t,Object.assign({jc:'center'},o||{}));
+  let x='';
+  // ปก
+  x+=D.blank(1)+C(g.project_name||'ชื่อโครงงาน',{style:'CoverTitle'})+(st.complete?'':C('(ฉบับร่าง)'))+D.blank(3);
+  x+=C('จัดทำโดย',{b:true})+b.members.map(mb=>C(`${mb.name}  รหัสนักศึกษา ${mb.student_id}`)).join('')+D.blank(2);
+  x+=C('ครูที่ปรึกษา',{b:true})+C(b.teacher?b.teacher.name:'-')+D.blank(Math.max(1,5-b.members.length));
+  x+=C(`รายงานนี้เป็นส่วนหนึ่งของรายวิชา ${subject}`)+(info.dept?C(info.dept):'')+(info.college?C(info.college):'')+C(`ภาคเรียนที่ ${term} ปีการศึกษา ${year}`);
+  // บทคัดย่อ
+  x+=D.h1(['บทคัดย่อ'],true);
+  x+=D.p(`**ชื่อโครงงาน:** ${g.project_name||'-'}`)+D.p(`**ผู้จัดทำ:** ${b.members.map(mb=>mb.name).join(', ')}`)+D.p(`**ครูที่ปรึกษา:** ${b.teacher?b.teacher.name:'-'}`)+D.p(`**รายวิชา:** ${subject||'-'}`)+D.p(`**ปีการศึกษา:** ${year}`)+'<w:p/>';
+  x+=get(1)?D.md(get(1),'body'):missing('บทคัดย่อ');
+  // กิตติกรรมประกาศ
+  x+=D.h1(['กิตติกรรมประกาศ'],true)+(get(2)?D.md(fill(get(2)),'body'):missing('กิตติกรรมประกาศ'))+'<w:p/>'+D.p('คณะผู้จัดทำ',{jc:'right'});
+  // สารบัญ (Word สร้างให้เมื่อเปิดไฟล์)
+  x+=D.p('สารบัญ',{style:'TocTitle',pb:true});
+  x+=`<w:p><w:r><w:fldChar w:fldCharType="begin" w:dirty="true"/></w:r><w:r><w:instrText xml:space="preserve"> TOC \\o "1-2" \\h \\z \\u </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:t xml:space="preserve">เปิดไฟล์ใน Word แล้วกด “ใช่” เพื่ออัปเดตสารบัญ หรือคลิกขวาที่ข้อความนี้ แล้วเลือก “อัปเดตเขตข้อมูล”</w:t></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p>`;
+  x+=`<w:p><w:pPr>${D.sect({fmt:'thaiLetters',titlePg:true})}</w:pPr></w:p>`;
+  // บทที่ 1–5
+  DOC_SECTIONS.filter(s=>s.chapter).forEach((s,i)=>{x+=D.h1([`บทที่ ${s.chapter}`,s.title],i>0)+(get(s.id)?D.md(get(s.id),'body'):missing(` บทที่ ${s.chapter}`))});
+  x+=D.h1(['บรรณานุกรม'],true)+(get(8)?D.md(get(8),'biblio'):missing('บรรณานุกรม'));
+  if(get(9)) x+=D.h1(['ภาคผนวก'],true)+D.md(get(9),'body');
+  const body=x+D.sect({fmt:'decimal',titlePg:false});
+  return {xml:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${D.W}><w:body>${body}</w:body></w:document>`,complete:st.complete};
+}
+async function exportDocx(b){
+  if(!window.JSZip){toast('โหลดตัวสร้างไฟล์ไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่',true);return}
+  const D=DOCX, doc=buildDocument(b), g=b.group, now=new Date().toISOString().replace(/\.\d+Z$/,'Z');
+  const zip=new JSZip();
+  zip.file('[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/header2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`);
+  zip.file('_rels/.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>`);
+  zip.file('word/_rels/document.xml.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdS" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rIdSet" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/><Relationship Id="rIdH1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/><Relationship Id="rIdH2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header2.xml"/></Relationships>`);
+  zip.file('word/document.xml',doc.xml);
+  zip.file('word/styles.xml',D.styles());
+  zip.file('word/settings.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:settings ${D.W}><w:defaultTabStop w:val="720"/><w:updateFields w:val="true"/><w:compat><w:compatSetting w:name="compatibilityMode" w:uri="http://schemas.microsoft.com/office/word" w:val="15"/></w:compat><w:themeFontLang w:val="en-US" w:bidi="th-TH"/></w:settings>`);
+  zip.file('word/header1.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ${D.W}><w:p><w:pPr><w:jc w:val="right"/></w:pPr><w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> PAGE </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:t>1</w:t></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p></w:hdr>`);
+  zip.file('word/header2.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ${D.W}><w:p/></w:hdr>`);
+  zip.file('docProps/core.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${D.x(g.project_name||'รายงานโครงงาน')}</dc:title><dc:creator>${D.x(b.members.map(mb=>mb.name).join(', '))}</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">${now}</dcterms:modified></cp:coreProperties>`);
+  const blob=await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+  // ใช้ชื่อไฟล์ภาษาอังกฤษ เพราะบางเบราว์เซอร์ตัดชื่อไฟล์ภาษาไทยทิ้ง
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`PBL-report-${g.group_id}${doc.complete?'':'-draft'}.docx`;
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
+  window.PBL_LAST_DOCX=blob;
+  toast(doc.complete?'ดาวน์โหลดเล่มรายงานแล้ว':'ดาวน์โหลดฉบับร่างแล้ว');
+}
+
 /* ======================== teacher ======================== */
 function viewTeacher(){
   if(S.tGroup) return viewTeacherGroup();
@@ -772,7 +964,7 @@ function viewTeacherGroup(){
   const tabs=[['P','ทำโครงงาน 6 ขั้น'],['R','เขียนเล่มรายงาน 11 ขั้น'],['M','สมาชิก']];
   const pendP=b.progress.filter(r=>r.track==='P'&&r.review_status==='pending').length, pendR=b.progress.filter(r=>r.track==='R'&&r.review_status==='pending').length;
   return `<div class="band"><div class="wrap"><div class="stack" style="gap:8px;min-width:0">
-    <div><button class="btn ghost sm" data-a="tback">← กลับรายการกลุ่ม</button></div>
+    <div class="row"><button class="btn ghost sm" data-a="tback">← กลับรายการกลุ่ม</button><span class="spacer"></span><button class="btn sm" data-a="ddownload">ดาวน์โหลดเล่มรายงาน (.docx)</button></div>
     <div class="eyebrow">กลุ่ม <span class="mono">${e(g.group_id)}</span> · โครงงาน${e(g.project_type)}</div><h1>${e(g.project_name||'(ยังไม่ตั้งชื่อ)')}</h1>
     <div class="meta"><span>รายวิชา <b>${e([g.subject_code,g.subject_name].filter(Boolean).join(' '))}</b></span><span>หน่วยที่จัดแบบโครงงาน <b>${e((g.units||[]).filter(u=>u.pbl).map(u=>u.no+' '+u.name).join(', ')||'—')}</b></span></div></div>
     <div class="meters"><div><div class="lbl"><span>ทำโครงงาน 6 ขั้น</span><span class="pct">${b.summary.pPct}%</span></div><div class="meter"><i style="width:${b.summary.pPct}%"></i></div></div>
@@ -859,7 +1051,6 @@ document.addEventListener('input',ev=>{
 function keepUnits(){ if(S.units&&$('uNo0')) S.units=collectUnits(); }
 const HANDLERS={
   ltab(el,v){S.loginTab=v;S.reg=null;render();setTimeout(()=>{const i=$('loginId')||$('adminPw');i&&i.focus()},0)},
-  fill(el,v){$('loginId').value=v},
   cancelReg(){S.reg=null;render()},
   login(){
     const id=val('loginId'); if(!id){toast('กรุณากรอกรหัส',true);return}
@@ -918,6 +1109,23 @@ const HANDLERS={
     if(p.link&&!/^https?:\/\//i.test(p.link)){toast('ลิงก์ต้องขึ้นต้นด้วย https://',true);return}
     act(async()=>{S.data=await call('saveProgress',p);delete S.drafts[k];toast(st==='submitted'?'ส่งครูตรวจแล้ว':'บันทึกแล้ว');render()});
   },
+  /* เล่มรายงาน */
+  dopen(el){const k=el.dataset.k;S.dOpen=S.dOpen===k?'':k;render();if(S.dOpen)$('task-'+k).scrollIntoView({block:'nearest'})},
+  dtpl(el){const k=el.dataset.k,ta=$('w-'+k),sec=DOC_SECTIONS[+k.split('-')[1]-1];
+    if(ta.value.trim()){toast('ช่องนี้มีข้อความแล้ว ลบข้อความเดิมก่อนถ้าต้องการใส่หัวข้อมาตรฐาน',true);return}
+    ta.value=sec.tpl;S.drafts[k]={work:ta.value};updCount(k);ta.focus()},
+  dpull(el){const k=el.dataset.k,ta=$('w-'+k),r=pmap(S.data.bundle.progress)['R-'+el.dataset.v+'-0'];
+    if(!r||!r.work.trim()){toast('ขั้นที่ '+el.dataset.v+' ยังไม่มีข้อความบันทึกไว้',true);return}
+    ta.value=(ta.value.trim()?ta.value.replace(/\s+$/,'')+'\n\n':'')+r.work;S.drafts[k]={work:ta.value};updCount(k);toast('ดึงข้อความแล้ว ตรวจและแก้ไขก่อนบันทึก')},
+  dsave(el){const k=el.dataset.k,[,step]=k.split('-'),work=$('w-'+k).value;
+    if(work.length>45000){toast('ข้อความยาวเกิน 45,000 ตัวอักษร',true);return}
+    act(async()=>{S.data=await call('saveProgress',{track:'D',step,sub:'0',status:work.trim()?'done':'doing',work,link:''});delete S.drafts[k];toast('บันทึกแล้ว');render()})},
+  dinfo(){const info={college:val('dCollege'),dept:val('dDept'),term:$('dTerm').value,year:val('dYear')};
+    act(async()=>{S.data=await call('saveProgress',{track:'D',step:'0',sub:'0',status:'done',work:JSON.stringify(info),link:''});toast('บันทึกข้อมูลหน้าปกแล้ว');render()})},
+  ddownload(){const b=S.role==='student'?S.data.bundle:S.tGroup;if(!b)return;
+    const unsaved=Object.keys(S.drafts).filter(k=>k.indexOf('D-')===0);
+    if(unsaved.length&&S.role==='student') toast('มีส่วนที่ยังไม่ได้กดบันทึก ไฟล์จะใช้ข้อความที่บันทึกไว้ล่าสุด',true);
+    exportDocx(b).catch(err=>toast('สร้างไฟล์ไม่สำเร็จ: '+err.message,true))},
   /* teacher */
   tgroup(el,v){act(async()=>{S.tGroup=await call(S.role==='admin'?'adminGroup':'groupDetail',{group_id:v});S.tTab='P';S.tStep=firstPendingStep(S.tGroup);S.tOpen='';render();window.scrollTo(0,0)})},
   tback(){S.tGroup=null;act(async()=>{S.data=await call(S.role==='admin'?'adminOverview':'teacherHome');render()})},
@@ -946,6 +1154,8 @@ const HANDLERS={
   asetting(){act(async()=>{S.data=await call('adminSetSetting',{max_members:val('setMax')});toast('บันทึกการตั้งค่าแล้ว');render()})},
   apw(){act(async()=>{await call('adminSetPassword',{old:$('pwOld').value,next:$('pwNew').value});S.defaultPw=false;toast('เปลี่ยนรหัสผู้ดูแลแล้ว');$('pwOld').value='';$('pwNew').value=''})}
 };
+function updCount(k){const c=$('cnt-'+k),t=$('w-'+k);if(c&&t)c.textContent=t.value.length.toLocaleString()+' / 45,000 ตัวอักษร'}
+document.addEventListener('input',ev=>{const k=ev.target.dataset&&ev.target.dataset.draft;if(k&&k.indexOf('D-')===0)updCount(k)});
 function arm(el){const k=el.dataset.a+(el.dataset.v||'');if(armed[k]){delete armed[k];return true}armed[k]=1;el.classList.add('armed');const old=el.textContent;el.textContent='กดอีกครั้งเพื่อยืนยัน';setTimeout(()=>{delete armed[k];if(el.isConnected){el.classList.remove('armed');el.textContent=old}},3500);return false}
 function scrollToWork(){const w=document.querySelector('.work section');if(w&&window.innerWidth<900)w.scrollIntoView({block:'start'})}
 function firstPendingStep(b){const r=b.progress.find(x=>x.track==='P'&&x.review_status==='pending');return r?+r.step:1}
@@ -955,12 +1165,6 @@ async function afterLogin(r){
   else if(r.role==='teacher'){S.data=await call('teacherHome');S.view='teacher';render()}
   else {S.data=await call('adminOverview');S.view='admin';S.adminTab='overview';render()}
   window.scrollTo(0,0);
-}
-function showDemoBanner(){
-  try{if(localStorage.getItem('pbl3_hide_demo')==='1')return}catch(err){}
-  $('demo').innerHTML=`<div class="demo-banner"><div class="wrap"><b>โหมดตัวอย่าง</b><span class="grow">ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น เมื่อติดตั้งบน Google Apps Script ระบบจะบันทึกลง Google Sheet จริง · รหัสผู้ดูแลตัวอย่าง: <span class="mono">admin1234</span></span><button class="btn ghost sm" id="demoReset">ล้างข้อมูลตัวอย่าง</button><button class="btn ghost sm" id="demoClose" aria-label="ปิดแถบนี้">ปิด ✕</button></div></div>`;
-  $('demoReset').onclick=()=>{MockServer.reset();location.reload()};
-  $('demoClose').onclick=()=>{try{localStorage.setItem('pbl3_hide_demo','1')}catch(err){}$('demo').innerHTML=''};
 }
 boot();
 </script>
