@@ -1,0 +1,1469 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>ห้องโครงงาน PBL</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: ใบงานช่าง — แถบหัวคงที่ + ราวขั้นตอนด้านซ้าย + พื้นที่ทำงานด้านขวา (มือถือเรียงลงมา) */
+:root{
+  --bg:#EDF1F0; --surface:#FFFFFF; --sunk:#E4EAE8; --ink:#13302A; --muted:#566A65; --line:#CCD7D3;
+  --accent:#0F6E5F; --accent-ink:#FFFFFF; --accent-soft:#D6EAE5;
+  --amber:#A86F00; --amber-soft:#FBEFCF; --danger:#B4412E; --danger-soft:#F7E0DA;
+  --ok:#2B7539; --ok-soft:#DDEFDF; --info:#2E5F9E; --info-soft:#DDE7F5;
+  --f-display:"Chakra Petch","IBM Plex Sans Thai",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --r:10px; --shadow:0 1px 2px rgba(19,48,42,.06),0 6px 20px rgba(19,48,42,.06);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1513; --surface:#14201D; --sunk:#0A1110; --ink:#E2ECE9; --muted:#94A7A2; --line:#2A3B37;
+  --accent:#52C3AC; --accent-ink:#06221C; --accent-soft:#173A33;
+  --amber:#F0BC3C; --amber-soft:#3A2F12; --danger:#F08A75; --danger-soft:#3D1E18;
+  --ok:#7FD08C; --ok-soft:#17331C; --info:#8DB4EA; --info-soft:#172A44;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1513; --surface:#14201D; --sunk:#0A1110; --ink:#E2ECE9; --muted:#94A7A2; --line:#2A3B37;
+  --accent:#52C3AC; --accent-ink:#06221C; --accent-soft:#173A33;
+  --amber:#F0BC3C; --amber-soft:#3A2F12; --danger:#F08A75; --danger-soft:#3D1E18;
+  --ok:#7FD08C; --ok-soft:#17331C; --info:#8DB4EA; --info-soft:#172A44;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{margin:0;color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.25;margin:0;text-wrap:balance;letter-spacing:.01em}
+h1{font-size:clamp(1.7rem,3.6vw,2.4rem);font-weight:700}
+h2{font-size:1.45rem;font-weight:700}
+h3{font-size:1.12rem;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.mono{font-family:var(--f-mono);font-size:.9em;letter-spacing:.02em}
+.eyebrow{font-family:var(--f-display);font-size:.82rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--accent)}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grow{flex:1 1 auto;min-width:0}
+.spacer{flex:1}
+
+/* topbar */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:14px;min-height:60px;padding-block:8px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;font-size:1.05rem;white-space:nowrap}
+.brand-mark{width:30px;height:30px;border-radius:7px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:.85rem;font-weight:700}
+.who{display:flex;align-items:center;gap:10px;min-width:0}
+.who-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:38vw}
+.role-tag{font-size:.75rem;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.busybar{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);height:3px;z-index:40;overflow:hidden}
+.busybar::after{content:"";position:absolute;inset:0;width:35%;background:var(--amber);animation:slide 1s ease-in-out infinite}
+@keyframes slide{from{transform:translateX(-100%)}to{transform:translateX(300%)}}
+
+/* buttons & fields */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;min-height:40px;text-decoration:none;color:var(--ink);transition:background .15s,border-color .15s}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink);background:var(--sunk)}
+.btn.danger{color:var(--danger);border-color:var(--danger-soft)}
+.btn.danger.armed{background:var(--danger);color:var(--surface);border-color:var(--danger)}
+.btn.sm{min-height:32px;padding:4px 10px;font-size:.86rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:.85rem;font-weight:600;color:var(--muted)}
+.input,select.input,textarea.input{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 12px;min-height:42px;transition:border-color .15s}
+textarea.input{min-height:120px;resize:vertical;line-height:1.6}
+.input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.card.shadow{box-shadow:var(--shadow);border-color:transparent}
+.note{border-left:3px solid var(--amber);background:var(--amber-soft);padding:10px 14px;border-radius:0 8px 8px 0;font-size:.92rem}
+.note.info{border-color:var(--info);background:var(--info-soft)}
+.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+.note.danger{border-color:var(--danger);background:var(--danger-soft)}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap;border:1px solid transparent}
+.chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.st-todo{color:var(--muted);background:var(--sunk)}
+.st-doing{color:var(--info);background:var(--info-soft)}
+.st-done{color:var(--ok);background:var(--ok-soft)}
+.st-submitted,.rv-pending{color:var(--amber);background:var(--amber-soft)}
+.rv-approved{color:var(--ok);background:var(--ok-soft)}
+.rv-revise{color:var(--danger);background:var(--danger-soft)}
+.stamp{font-family:var(--f-display);font-size:.72rem;font-weight:700;letter-spacing:.06em;color:var(--amber);border:1.5px solid var(--amber);border-radius:4px;padding:0 6px;white-space:nowrap;transform:rotate(-2deg);display:inline-block}
+.tag{display:inline-block;font-size:.8rem;padding:2px 8px;border-radius:6px;background:var(--sunk);color:var(--ink)}
+.tag.pbl{background:var(--accent-soft);color:var(--accent);font-weight:600}
+
+/* progress */
+.meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.meter>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+.meter.amber>i{background:var(--amber)}
+.pct{font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums}
+
+/* login */
+.login{display:grid;grid-template-columns:1.15fr 1fr;gap:40px;align-items:start;padding-block:48px}
+.login-intro{display:flex;flex-direction:column;gap:22px;min-width:0}
+.lead{font-size:1.05rem;color:var(--muted);max-width:60ch}
+.paths{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.path{border-top:3px solid var(--accent);padding-top:12px;min-width:0}
+.path.r{border-color:var(--amber)}
+.path ol{margin:8px 0 0;padding-left:1.4em;font-size:.9rem;color:var(--muted)}
+.path .big{font-family:var(--f-display);font-size:2.4rem;font-weight:700;line-height:1;color:var(--accent)}
+.path.r .big{color:var(--amber)}
+.seg{display:flex;background:var(--sunk);padding:4px;border-radius:10px;gap:4px}
+.seg button{flex:1;border:0;background:transparent;padding:8px 6px;border-radius:7px;font-weight:600;cursor:pointer;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.demo-ids{font-size:.85rem;color:var(--muted)}
+.demo-ids button{border:0;background:var(--sunk);border-radius:6px;padding:1px 7px;cursor:pointer;font-family:var(--f-mono);font-size:.82rem;color:var(--ink)}
+
+/* onboarding */
+.ob{padding-block:32px;display:flex;flex-direction:column;gap:24px}
+.ob-steps{display:flex;gap:8px;flex-wrap:wrap;counter-reset:ob}
+.ob-steps span{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--muted);font-size:.9rem;padding:6px 12px 6px 6px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
+.ob-steps span::before{counter-increment:ob;content:counter(ob);width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--sunk);font-family:var(--f-display);font-size:.8rem}
+.ob-steps span.on{color:var(--ink);border-color:var(--accent)}
+.ob-steps span.on::before{background:var(--accent);color:var(--accent-ink)}
+.ob-steps span.ok::before{content:"✓";background:var(--ok-soft);color:var(--ok)}
+.lesson{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;align-items:start}
+.lesson article{display:flex;flex-direction:column;gap:22px;max-width:70ch}
+.lesson section{display:flex;flex-direction:column;gap:8px}
+.lesson ul,.lesson ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:4px}
+.compare{width:100%;border-collapse:collapse;font-size:.9rem}
+.compare th,.compare td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.compare th{font-family:var(--f-display);font-weight:600;background:var(--sunk)}
+.compare td.hl{background:var(--accent-soft)}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+.quiz .q{display:flex;flex-direction:column;gap:6px;padding:12px 0;border-bottom:1px dashed var(--line)}
+.quiz label{display:flex;gap:8px;align-items:flex-start;cursor:pointer;font-size:.93rem}
+.quiz input{margin-top:5px;accent-color:var(--accent)}
+.types{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.type{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;background:var(--surface)}
+.type:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.type input{margin-top:6px;accent-color:var(--accent)}
+.type b{display:block;font-weight:600}
+.units{display:flex;flex-direction:column;gap:8px}
+.unit{display:grid;grid-template-columns:70px minmax(0,1fr) auto auto;gap:8px;align-items:center}
+.toggle{display:flex;align-items:center;gap:6px;font-size:.85rem;font-weight:600;white-space:nowrap;cursor:pointer;padding:6px 10px;border-radius:8px;border:1px solid var(--line)}
+.toggle:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.toggle input{accent-color:var(--accent)}
+.member{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:700;flex:none}
+.pick-list{max-height:240px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.pick{display:flex;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.pick:last-child{border-bottom:0}
+.pick:hover{background:var(--sunk)}
+.pick.on{background:var(--accent-soft)}
+
+/* home */
+.band{background:var(--surface);border-bottom:1px solid var(--line)}
+.band .wrap{padding-block:22px;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:end}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.88rem;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+.meters{display:flex;flex-direction:column;gap:10px}
+.meters .lbl{display:flex;justify-content:space-between;font-size:.86rem;font-weight:600}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs button{border:0;background:transparent;padding:12px 14px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;font-family:var(--f-display);font-size:.98rem}
+.tabs button.on{color:var(--ink);border-color:var(--accent)}
+.tabs .count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--amber-soft);color:var(--amber);font-size:.75rem;margin-left:6px}
+.work{display:grid;grid-template-columns:270px minmax(0,1fr);gap:24px;padding-block:24px;align-items:start}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px);display:flex;flex-direction:column;gap:2px}
+.rail button{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px 8px;text-align:left;border:0;background:transparent;border-radius:8px;padding:9px 10px;cursor:pointer;align-items:center}
+.rail button:hover{background:var(--surface)}
+.rail button.on{background:var(--surface);box-shadow:var(--shadow)}
+.rail .n{font-family:var(--f-display);font-weight:700;font-size:1.15rem;color:var(--muted)}
+.rail button.on .n{color:var(--accent)}
+.rail .t{font-weight:600;font-size:.9rem;line-height:1.35}
+.rail .s{grid-column:2;font-size:.76rem;color:var(--muted);display:flex;gap:6px;align-items:center}
+.rail .lock{color:var(--amber)}
+.step-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
+.step-no{font-family:var(--f-display);font-weight:700;font-size:3rem;line-height:.9;color:var(--accent);font-variant-numeric:tabular-nums}
+.tasks{display:flex;flex-direction:column;gap:10px}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.task.open{border-color:var(--accent);box-shadow:var(--shadow)}
+.task-h{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 16px;cursor:pointer;width:100%;border:0;background:transparent;text-align:left}
+.task-h .k{font-family:var(--f-display);font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.task-h .tt{font-weight:600}
+.task-h .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.task-b{padding:4px 16px 18px;display:flex;flex-direction:column;gap:14px;border-top:1px dashed var(--line)}
+.prompt{background:var(--sunk);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.prompt-h{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px;border-bottom:1px solid var(--line);font-size:.8rem;font-weight:600;color:var(--muted)}
+.prompt pre{margin:0;padding:12px 14px;white-space:pre-wrap;word-break:break-word;font-family:var(--f-body);font-size:.92rem;line-height:1.7;max-height:360px;overflow:auto}
+.ph{background:var(--amber-soft);color:var(--amber);border-radius:3px;padding:0 2px;font-weight:600}
+.ph.filled{background:var(--accent-soft);color:var(--accent)}
+.status-pick{display:flex;flex-wrap:wrap;gap:6px}
+.status-pick label{cursor:pointer}
+.status-pick input{position:absolute;opacity:0;pointer-events:none}
+.status-pick span{display:inline-block;padding:6px 12px;border-radius:8px;border:1px solid var(--line);font-size:.86rem;font-weight:600;color:var(--muted)}
+.status-pick input:checked+span{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.status-pick input:focus-visible+span{outline:2px solid var(--accent)}
+.feedback{border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;background:var(--surface)}
+.feedback.revise{border-color:var(--danger);background:var(--danger-soft)}
+.feedback.approved{border-color:var(--ok);background:var(--ok-soft)}
+.kv{display:grid;grid-template-columns:130px minmax(0,1fr);gap:4px 12px;font-size:.92rem}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+.locked{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.worktext{white-space:pre-wrap;word-break:break-word;background:var(--sunk);border-radius:8px;padding:10px 12px;font-size:.92rem;max-height:320px;overflow:auto}
+
+/* teacher/admin lists */
+.glist{display:flex;flex-direction:column;gap:10px}
+.gitem{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) auto;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;cursor:pointer;text-align:left;width:100%}
+.gitem:hover{border-color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.stat .v{font-family:var(--f-display);font-size:1.9rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.tbl{width:100%;border-collapse:collapse;font-size:.9rem}
+.tbl th,.tbl td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.tbl th{font-family:var(--f-display);font-weight:600;font-size:.85rem;color:var(--muted);background:var(--sunk);position:sticky;top:0}
+.tbl td.num{font-variant-numeric:tabular-nums}
+.review-form{display:flex;flex-direction:column;gap:10px;border-top:1px dashed var(--line);padding-top:12px}
+.mini-meter{display:flex;align-items:center;gap:8px;font-size:.82rem}
+.mini-meter .meter{flex:1;height:6px}
+.section{padding-block:24px;display:flex;flex-direction:column;gap:18px}
+
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(92vw,520px)}
+#toast div{background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:500;box-shadow:var(--shadow);animation:pop .2s ease-out}
+#toast div.err{background:var(--danger);color:#fff}
+@keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+.demo-banner{background:var(--amber-soft);color:var(--ink);font-size:.85rem;border-bottom:1px solid var(--line)}
+.demo-banner .wrap{padding-block:6px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+@media (max-width:900px){
+  .login{grid-template-columns:1fr;padding-block:28px;gap:28px}
+  .lesson{grid-template-columns:1fr}
+  .band .wrap{grid-template-columns:1fr}
+  .work{grid-template-columns:1fr}
+  .rail{position:static;flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px}
+  .rail button{min-width:200px;background:var(--surface);border:1px solid var(--line)}
+  .gitem{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){
+  .paths{grid-template-columns:1fr}
+  .unit{grid-template-columns:56px minmax(0,1fr);}
+  .unit .toggle,.unit .btn{grid-column:auto}
+  .task-h{grid-template-columns:40px minmax(0,1fr)}
+  .task-h .chips{grid-column:1/-1;justify-content:flex-start}
+  .kv{grid-template-columns:1fr}
+  .gitem{grid-template-columns:1fr}
+  .who-name{max-width:42vw}
+  .brand span.full,.role-tag{display:none}
+  .topbar .btn{white-space:nowrap}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="demo"></div>
+<div id="busy" class="busybar" hidden></div>
+<div id="app"></div>
+<div id="toast" aria-live="polite"></div>
+
+<script>
+
+/* ===================== CORE (ใช้ร่วมกับโหมดตัวอย่างในเบราว์เซอร์) ===================== */
+var Core = (function () {
+  var SCHEMA = {
+    students: { sheet: 'นักศึกษา', cols: [['student_id', 'รหัสนักศึกษา'], ['name', 'ชื่อ-สกุล'], ['phone', 'เบอร์โทร'], ['level', 'ระดับชั้น'], ['department', 'สาขาวิชา'], ['group_id', 'รหัสกลุ่ม'], ['created_at', 'วันที่ลงทะเบียน']] },
+    teachers: { sheet: 'ครูผู้สอน', cols: [['teacher_id', 'รหัสครู'], ['name', 'ชื่อ-สกุล'], ['phone', 'เบอร์โทร'], ['department', 'แผนก/สาขา'], ['created_at', 'วันที่ลงทะเบียน']] },
+    groups: { sheet: 'กลุ่มโครงงาน', cols: [['group_id', 'รหัสกลุ่ม'], ['project_name', 'ชื่อโครงงาน'], ['project_type', 'ประเภทโครงงาน'], ['format', 'รูปแบบการจัด'], ['subject_code', 'รหัสวิชา'], ['subject_name', 'ชื่อวิชา'], ['units', 'หน่วยการเรียนรู้ (JSON)'], ['teacher_id', 'รหัสครูผู้สอน'], ['lesson_done', 'ผ่านบทเรียน'], ['created_by', 'ผู้สร้างกลุ่ม'], ['created_at', 'วันที่สร้าง'], ['updated_at', 'อัปเดตล่าสุด']] },
+    progress: { sheet: 'ความก้าวหน้า', cols: [['group_id', 'รหัสกลุ่ม'], ['track', 'เส้นทาง'], ['step', 'ขั้น'], ['sub', 'ขั้นย่อย'], ['status', 'สถานะ'], ['work', 'บันทึกผลงาน'], ['link', 'ลิงก์ผลงาน'], ['updated_by', 'ผู้บันทึก'], ['updated_at', 'เวลาบันทึก'], ['review_status', 'ผลตรวจครู'], ['review_comment', 'ความเห็นครู'], ['score', 'คะแนน'], ['reviewed_at', 'เวลาตรวจ']] },
+    settings: { sheet: 'ตั้งค่า', cols: [['key', 'key'], ['value', 'value']] },
+    logs: { sheet: 'บันทึกการใช้งาน', cols: [['time', 'เวลา'], ['role', 'บทบาท'], ['user_id', 'ผู้ใช้'], ['action', 'การทำงาน'], ['detail', 'รายละเอียด']] }
+  };
+  // จำนวนขั้นย่อยของการทำโครงงาน 6 ขั้น และจำนวนขั้นของการเขียนเล่ม 11 ขั้น
+  var P_SUBS = [4, 6, 7, 5, 5, 5];
+  var R_STEPS = 11;
+  var DONE = { done: 1, submitted: 1 };
+  var STATUSES = { todo: 1, doing: 1, done: 1, submitted: 1 };
+  var DEFAULT_ADMIN = 'admin1234';
+
+  function create(env) {
+    var db = env.makeDB(SCHEMA);
+
+    /* ---------- helpers ---------- */
+    function s(v, max) { v = (v === null || v === undefined) ? '' : String(v).trim(); return max ? v.slice(0, max) : v; }
+    function fail(msg) { throw new Error(msg); }
+    function idOk(v) { return /^[0-9A-Za-z\-_.]{3,20}$/.test(v); }
+    function phoneOk(v) { return /^[0-9+\- ]{9,15}$/.test(v); }
+    function one(t, key, val) { var r = db.all(t).filter(function (o) { return o[key] === val; }); return r.length ? r[0] : null; }
+    function setting(k, dflt) { var r = one('settings', 'key', k); return r ? r.value : dflt; }
+    function setSetting(k, v) {
+      if (one('settings', 'key', k)) db.update('settings', function (o) { return o.key === k; }, { value: v });
+      else db.insert('settings', { key: k, value: v });
+    }
+    function log(role, uid, action, detail) {
+      try { db.insert('logs', { time: env.now(), role: role, user_id: uid, action: action, detail: s(detail, 200) }); } catch (e) {}
+    }
+    function ensureAdmin() { if (!setting('admin_hash', '')) setSetting('admin_hash', env.hash(DEFAULT_ADMIN)); }
+    function startSession(obj) { var t = env.uid(); env.session.put(t, obj); return t; }
+    function maxMembers() { var n = parseInt(setting('max_members', '5'), 10); return isNaN(n) ? 5 : n; }
+    function pubTeacher(t) { return t ? { teacher_id: t.teacher_id, name: t.name, department: t.department } : null; }
+    function maskPhone(p) { p = s(p); return p.length >= 7 ? p.slice(0, 3) + '-xxx-' + p.slice(-4) : p; }
+    function parseUnits(u) { try { var a = JSON.parse(u || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+
+    function summarize(rows) {
+      var sum = { P: 0, R: 0, pTotal: 0, rTotal: R_STEPS, pending: 0, revise: 0, approved: 0, last: '' };
+      P_SUBS.forEach(function (n) { sum.pTotal += n; });
+      rows.forEach(function (r) {
+        if (DONE[r.status]) { if (r.track === 'P') sum.P++; else if (r.track === 'R') sum.R++; }
+        if (r.status === 'submitted' && r.review_status === 'pending') sum.pending++;
+        if (r.review_status === 'revise') sum.revise++;
+        if (r.review_status === 'approved') sum.approved++;
+        if (r.updated_at > sum.last) sum.last = r.updated_at;
+      });
+      sum.pPct = Math.round(sum.P * 100 / sum.pTotal);
+      sum.rPct = Math.round(sum.R * 100 / sum.rTotal);
+      return sum;
+    }
+
+    function groupBundle(gid, opts) {
+      var g = one('groups', 'group_id', gid);
+      if (!g) return null;
+      var members = db.all('students').filter(function (o) { return o.group_id === gid; })
+        .map(function (m) { return { student_id: m.student_id, name: m.name, phone: opts && opts.fullPhone ? m.phone : maskPhone(m.phone), level: m.level, department: m.department }; });
+      var progress = db.all('progress').filter(function (o) { return o.group_id === gid; });
+      var t = g.teacher_id ? one('teachers', 'teacher_id', g.teacher_id) : null;
+      g.units = parseUnits(g.units);
+      return { group: g, members: members, teacher: pubTeacher(t), progress: progress, summary: summarize(progress) };
+    }
+
+    function studentState(sid) {
+      var st = one('students', 'student_id', sid);
+      if (!st) fail('SESSION: ไม่พบข้อมูลนักศึกษา กรุณาเข้าสู่ระบบใหม่');
+      var bundle = st.group_id ? groupBundle(st.group_id) : null;
+      return {
+        me: st, bundle: bundle, maxMembers: maxMembers(),
+        teachers: db.all('teachers').map(pubTeacher)
+      };
+    }
+
+    function requireGroup(sess) {
+      var st = one('students', 'student_id', sess.id);
+      if (!st || !st.group_id) fail('ยังไม่มีกลุ่ม กรุณาบันทึกข้อมูลโครงงานก่อน');
+      return st.group_id;
+    }
+
+    function cleanUnits(arr) {
+      if (!Array.isArray(arr)) return [];
+      return arr.slice(0, 30).map(function (u) {
+        return { no: s(u.no, 10), name: s(u.name, 150), pbl: !!u.pbl };
+      }).filter(function (u) { return u.name; });
+    }
+
+    function upsertStudent(p, gid) {
+      var id = s(p.student_id, 20), name = s(p.name, 100), phone = s(p.phone, 15);
+      if (!idOk(id)) fail('รหัสนักศึกษาไม่ถูกต้อง (ตัวเลข/ตัวอักษร 3–20 ตัว)');
+      var ex = one('students', 'student_id', id);
+      if (ex) return ex;
+      if (!name) fail('กรุณากรอกชื่อ-สกุลของ ' + id);
+      if (!phoneOk(phone)) fail('กรุณากรอกเบอร์โทรให้ถูกต้อง (9–10 หลัก)');
+      return db.insert('students', { student_id: id, name: name, phone: phone, level: s(p.level, 30), department: s(p.department, 80), group_id: gid || '', created_at: env.now() });
+    }
+
+    function upsertTeacher(p) {
+      var id = s(p.teacher_id, 20), name = s(p.name, 100), phone = s(p.phone, 15);
+      if (!idOk(id)) fail('รหัสครูไม่ถูกต้อง (ตัวเลข/ตัวอักษร 3–20 ตัว)');
+      var ex = one('teachers', 'teacher_id', id);
+      if (ex) return ex;
+      if (!name) fail('กรุณากรอกชื่อ-สกุลครู');
+      if (!phoneOk(phone)) fail('กรุณากรอกเบอร์โทรครูให้ถูกต้อง');
+      return db.insert('teachers', { teacher_id: id, name: name, phone: phone, department: s(p.department, 80), created_at: env.now() });
+    }
+
+    function doReview(gid, p, reviewer) {
+      var track = s(p.track), step = s(p.step), sub = s(p.sub || '0');
+      var rs = s(p.review_status);
+      if (rs !== 'approved' && rs !== 'revise') fail('ผลตรวจต้องเป็น "ผ่าน" หรือ "ส่งกลับแก้ไข"');
+      var score = s(p.score, 6);
+      if (score && isNaN(Number(score))) fail('คะแนนต้องเป็นตัวเลข');
+      var match = function (o) { return o.group_id === gid && o.track === track && o.step === step && o.sub === sub; };
+      var patch = { review_status: rs, review_comment: s(p.review_comment, 2000), score: score, reviewed_at: env.now() };
+      if (rs === 'revise') patch.status = 'doing';
+      if (!db.update('progress', match, patch)) {
+        patch.group_id = gid; patch.track = track; patch.step = step; patch.sub = sub;
+        patch.status = rs === 'approved' ? 'done' : 'doing'; patch.updated_by = reviewer; patch.updated_at = env.now();
+        db.insert('progress', patch);
+      }
+      log('teacher', reviewer, 'review', gid + ' ' + track + step + '.' + sub + ' ' + rs);
+      return groupBundle(gid);
+    }
+
+    /* ---------- public actions ---------- */
+    var PUBLIC = {
+      loginStudent: function (p) {
+        var id = s(p.student_id, 20);
+        if (!idOk(id)) fail('กรุณากรอกรหัสนักศึกษาให้ถูกต้อง');
+        var st = one('students', 'student_id', id);
+        if (!st) return { needRegister: true };
+        log('student', id, 'login', '');
+        return { token: startSession({ role: 'student', id: id }), role: 'student' };
+      },
+      registerStudent: function (p) {
+        var st = upsertStudent(p, '');
+        log('student', st.student_id, 'register', '');
+        return { token: startSession({ role: 'student', id: st.student_id }), role: 'student' };
+      },
+      loginTeacher: function (p) {
+        var id = s(p.teacher_id, 20);
+        if (!idOk(id)) fail('กรุณากรอกรหัสครูให้ถูกต้อง');
+        var t = one('teachers', 'teacher_id', id);
+        if (!t) return { needRegister: true };
+        log('teacher', id, 'login', '');
+        return { token: startSession({ role: 'teacher', id: id }), role: 'teacher' };
+      },
+      registerTeacher: function (p) {
+        var t = upsertTeacher(p);
+        log('teacher', t.teacher_id, 'register', '');
+        return { token: startSession({ role: 'teacher', id: t.teacher_id }), role: 'teacher' };
+      },
+      loginAdmin: function (p) {
+        ensureAdmin();
+        if (env.hash(s(p.password)) !== setting('admin_hash', '')) { log('admin', '-', 'login-failed', ''); fail('รหัสผู้ดูแลไม่ถูกต้อง'); }
+        log('admin', 'admin', 'login', '');
+        return { token: startSession({ role: 'admin', id: 'admin' }), role: 'admin', defaultPassword: s(p.password) === DEFAULT_ADMIN };
+      },
+      logout: function (p, sess, token) { return true; }
+    };
+
+    /* ---------- role actions ---------- */
+    var STUDENT = {
+      me: function (p, sess) { return studentState(sess.id); },
+      saveSetup: function (p, sess) {
+        var st = one('students', 'student_id', sess.id);
+        var patch = {};
+        if (p.project_name !== undefined) patch.project_name = s(p.project_name, 200);
+        if (p.project_type !== undefined) patch.project_type = s(p.project_type, 80);
+        if (p.subject_code !== undefined) patch.subject_code = s(p.subject_code, 20);
+        if (p.subject_name !== undefined) patch.subject_name = s(p.subject_name, 150);
+        if (p.units !== undefined) {
+          var units = cleanUnits(p.units);
+          if (!units.some(function (u) { return u.pbl; })) fail('เลือกหน่วยที่จัดแบบโครงงานอย่างน้อย 1 หน่วย');
+          patch.units = JSON.stringify(units);
+        }
+        if (p.teacher_id !== undefined) {
+          var tid = s(p.teacher_id, 20);
+          if (tid && !one('teachers', 'teacher_id', tid)) fail('ไม่พบรหัสครูนี้ในระบบ');
+          patch.teacher_id = tid;
+        }
+        if (p.lesson_done) patch.lesson_done = '1';
+        patch.updated_at = env.now();
+        if (!st.group_id) {
+          if (!patch.project_type) fail('กรุณาเลือกประเภทโครงงาน');
+          var gid = 'G' + env.uid().slice(0, 6).toUpperCase();
+          patch.group_id = gid; patch.format = 'รูปแบบที่ 3 จัดเฉพาะบางหน่วยการเรียนรู้';
+          patch.created_by = sess.id; patch.created_at = env.now();
+          db.insert('groups', patch);
+          db.update('students', function (o) { return o.student_id === sess.id; }, { group_id: gid });
+          log('student', sess.id, 'create-group', gid);
+        } else {
+          db.update('groups', function (o) { return o.group_id === st.group_id; }, patch);
+          log('student', sess.id, 'update-group', st.group_id);
+        }
+        return studentState(sess.id);
+      },
+      lookupStudent: function (p) {
+        var id = s(p.student_id, 20);
+        var st = one('students', 'student_id', id);
+        if (!st) return { exists: false };
+        return { exists: true, student_id: st.student_id, name: st.name, phone: maskPhone(st.phone), group_id: st.group_id };
+      },
+      addMember: function (p, sess) {
+        var gid = requireGroup(sess);
+        var count = db.all('students').filter(function (o) { return o.group_id === gid; }).length;
+        if (count >= maxMembers()) fail('กลุ่มมีสมาชิกครบ ' + maxMembers() + ' คนแล้ว');
+        var st = upsertStudent(p, gid);
+        if (st.group_id && st.group_id !== gid) fail(st.name + ' อยู่ในกลุ่มอื่นแล้ว (' + st.group_id + ')');
+        db.update('students', function (o) { return o.student_id === st.student_id; }, { group_id: gid });
+        log('student', sess.id, 'add-member', st.student_id);
+        return studentState(sess.id);
+      },
+      removeMember: function (p, sess) {
+        var gid = requireGroup(sess), id = s(p.student_id, 20);
+        if (id === sess.id) fail('ไม่สามารถลบตัวเองออกจากกลุ่มได้');
+        db.update('students', function (o) { return o.student_id === id && o.group_id === gid; }, { group_id: '' });
+        log('student', sess.id, 'remove-member', id);
+        return studentState(sess.id);
+      },
+      addTeacher: function (p, sess) {
+        var t = upsertTeacher(p);
+        var st = one('students', 'student_id', sess.id);
+        if (st.group_id) db.update('groups', function (o) { return o.group_id === st.group_id; }, { teacher_id: t.teacher_id, updated_at: env.now() });
+        log('student', sess.id, 'add-teacher', t.teacher_id);
+        return studentState(sess.id);
+      },
+      saveProgress: function (p, sess) {
+        var gid = requireGroup(sess);
+        var track = s(p.track), step = s(p.step), sub = s(p.sub || '0'), status = s(p.status);
+        if (track !== 'P' && track !== 'R') fail('เส้นทางไม่ถูกต้อง');
+        if (!STATUSES[status]) fail('สถานะไม่ถูกต้อง');
+        var patch = { status: status, work: s(p.work, 20000), link: s(p.link, 500), updated_by: sess.id, updated_at: env.now() };
+        if (status === 'submitted') patch.review_status = 'pending';
+        var match = function (o) { return o.group_id === gid && o.track === track && o.step === step && o.sub === sub; };
+        var ex = db.all('progress').filter(match)[0];
+        if (ex && ex.review_status === 'approved' && status !== 'submitted') patch.review_status = 'approved';
+        if (ex) db.update('progress', match, patch);
+        else { patch.group_id = gid; patch.track = track; patch.step = step; patch.sub = sub; if (!patch.review_status) patch.review_status = ''; db.insert('progress', patch); }
+        log('student', sess.id, 'progress', track + step + '.' + sub + ' ' + status);
+        return studentState(sess.id);
+      }
+    };
+
+    var TEACHER = {
+      teacherHome: function (p, sess) {
+        var t = one('teachers', 'teacher_id', sess.id);
+        if (!t) fail('SESSION: ไม่พบข้อมูลครู');
+        var groups = db.all('groups').filter(function (g) { return g.teacher_id === sess.id; })
+          .map(function (g) { return groupBundle(g.group_id); });
+        return { me: t, groups: groups };
+      },
+      groupDetail: function (p, sess) {
+        var g = one('groups', 'group_id', s(p.group_id));
+        if (!g || g.teacher_id !== sess.id) fail('กลุ่มนี้ไม่ได้เลือกท่านเป็นครูผู้สอน');
+        return groupBundle(g.group_id, { fullPhone: true });
+      },
+      review: function (p, sess) {
+        var g = one('groups', 'group_id', s(p.group_id));
+        if (!g || g.teacher_id !== sess.id) fail('กลุ่มนี้ไม่ได้เลือกท่านเป็นครูผู้สอน');
+        return doReview(g.group_id, p, sess.id);
+      },
+      updateProfile: function (p, sess) {
+        var patch = {};
+        if (p.name) patch.name = s(p.name, 100);
+        if (p.phone) { if (!phoneOk(s(p.phone))) fail('เบอร์โทรไม่ถูกต้อง'); patch.phone = s(p.phone, 15); }
+        if (p.department !== undefined) patch.department = s(p.department, 80);
+        db.update('teachers', function (o) { return o.teacher_id === sess.id; }, patch);
+        return TEACHER.teacherHome(p, sess);
+      }
+    };
+
+    var ADMIN = {
+      adminOverview: function () {
+        var groups = db.all('groups').map(function (g) { return groupBundle(g.group_id, { fullPhone: true }); });
+        return {
+          students: db.all('students'),
+          teachers: db.all('teachers'),
+          groups: groups,
+          settings: { max_members: String(maxMembers()) },
+          logs: db.all('logs').slice(-60).reverse()
+        };
+      },
+      adminSaveRecord: function (p) {
+        var t = s(p.table), r = p.record || {};
+        if (t === 'students') {
+          var id = s(r.student_id, 20);
+          if (!idOk(id)) fail('รหัสนักศึกษาไม่ถูกต้อง');
+          var patch = { name: s(r.name, 100), phone: s(r.phone, 15), level: s(r.level, 30), department: s(r.department, 80) };
+          if (r.group_id !== undefined) {
+            var gid = s(r.group_id, 20);
+            if (gid && !one('groups', 'group_id', gid)) fail('ไม่พบรหัสกลุ่ม ' + gid);
+            patch.group_id = gid;
+          }
+          if (one('students', 'student_id', id)) db.update('students', function (o) { return o.student_id === id; }, patch);
+          else { patch.student_id = id; patch.created_at = env.now(); db.insert('students', patch); }
+        } else if (t === 'teachers') {
+          var tid = s(r.teacher_id, 20);
+          if (!idOk(tid)) fail('รหัสครูไม่ถูกต้อง');
+          var tp = { name: s(r.name, 100), phone: s(r.phone, 15), department: s(r.department, 80) };
+          if (one('teachers', 'teacher_id', tid)) db.update('teachers', function (o) { return o.teacher_id === tid; }, tp);
+          else { tp.teacher_id = tid; tp.created_at = env.now(); db.insert('teachers', tp); }
+        } else if (t === 'groups') {
+          var g = s(r.group_id, 20);
+          if (!one('groups', 'group_id', g)) fail('ไม่พบกลุ่ม');
+          var gp = { project_name: s(r.project_name, 200), teacher_id: s(r.teacher_id, 20), updated_at: env.now() };
+          if (gp.teacher_id && !one('teachers', 'teacher_id', gp.teacher_id)) fail('ไม่พบรหัสครู ' + gp.teacher_id);
+          db.update('groups', function (o) { return o.group_id === g; }, gp);
+        } else fail('ตารางไม่ถูกต้อง');
+        log('admin', 'admin', 'save-' + t, JSON.stringify(r).slice(0, 120));
+        return ADMIN.adminOverview();
+      },
+      adminDeleteRecord: function (p) {
+        var t = s(p.table), id = s(p.id, 20);
+        if (t === 'students') db.remove('students', function (o) { return o.student_id === id; });
+        else if (t === 'teachers') {
+          db.remove('teachers', function (o) { return o.teacher_id === id; });
+          db.update('groups', function (o) { return o.teacher_id === id; }, { teacher_id: '' });
+        } else if (t === 'groups') {
+          db.update('students', function (o) { return o.group_id === id; }, { group_id: '' });
+          db.remove('progress', function (o) { return o.group_id === id; });
+          db.remove('groups', function (o) { return o.group_id === id; });
+        } else fail('ตารางไม่ถูกต้อง');
+        log('admin', 'admin', 'delete-' + t, id);
+        return ADMIN.adminOverview();
+      },
+      adminImport: function (p) {
+        var t = s(p.table), rows = Array.isArray(p.rows) ? p.rows.slice(0, 2000) : [];
+        var added = 0, updated = 0, errors = [];
+        rows.forEach(function (r, i) {
+          try {
+            if (t === 'students') {
+              var id = s(r.student_id, 20);
+              if (!idOk(id)) throw new Error('รหัสไม่ถูกต้อง');
+              if (one('students', 'student_id', id)) {
+                var up = {}; ['name', 'phone', 'level', 'department'].forEach(function (k) { if (s(r[k])) up[k] = s(r[k], 100); });
+                db.update('students', function (o) { return o.student_id === id; }, up); updated++;
+              } else {
+                db.insert('students', { student_id: id, name: s(r.name, 100), phone: s(r.phone, 15), level: s(r.level, 30), department: s(r.department, 80), group_id: '', created_at: env.now() }); added++;
+              }
+            } else if (t === 'teachers') {
+              var tid = s(r.teacher_id, 20);
+              if (!idOk(tid)) throw new Error('รหัสไม่ถูกต้อง');
+              if (one('teachers', 'teacher_id', tid)) {
+                var tu = {}; ['name', 'phone', 'department'].forEach(function (k) { if (s(r[k])) tu[k] = s(r[k], 100); });
+                db.update('teachers', function (o) { return o.teacher_id === tid; }, tu); updated++;
+              } else {
+                db.insert('teachers', { teacher_id: tid, name: s(r.name, 100), phone: s(r.phone, 15), department: s(r.department, 80), created_at: env.now() }); added++;
+              }
+            } else throw new Error('ตารางไม่ถูกต้อง');
+          } catch (e) { errors.push('แถว ' + (i + 1) + ': ' + e.message); }
+        });
+        log('admin', 'admin', 'import-' + t, added + ' เพิ่ม / ' + updated + ' แก้ไข');
+        return { added: added, updated: updated, errors: errors.slice(0, 20), overview: ADMIN.adminOverview() };
+      },
+      adminGroup: function (p) { return groupBundle(s(p.group_id), { fullPhone: true }); },
+      adminReview: function (p) { return doReview(s(p.group_id), p, 'admin'); },
+      adminSetPassword: function (p) {
+        ensureAdmin();
+        if (env.hash(s(p.old)) !== setting('admin_hash', '')) fail('รหัสเดิมไม่ถูกต้อง');
+        if (s(p.next).length < 8) fail('รหัสใหม่ต้องยาวอย่างน้อย 8 ตัวอักษร');
+        setSetting('admin_hash', env.hash(s(p.next)));
+        log('admin', 'admin', 'change-password', '');
+        return true;
+      },
+      adminSetSetting: function (p) {
+        var n = parseInt(s(p.max_members), 10);
+        if (isNaN(n) || n < 1 || n > 20) fail('จำนวนสมาชิกสูงสุดต้องอยู่ระหว่าง 1–20');
+        setSetting('max_members', String(n));
+        return ADMIN.adminOverview();
+      }
+    };
+
+    var ROLES = { student: STUDENT, teacher: TEACHER, admin: ADMIN };
+
+    return {
+      handle: function (action, p, token) {
+        if (action === 'logout') { if (token) env.session.del(token); return true; }
+        if (PUBLIC[action]) return PUBLIC[action](p);
+        var sess = token ? env.session.get(token) : null;
+        if (!sess) fail('SESSION: หมดเวลาการใช้งาน กรุณาเข้าสู่ระบบใหม่');
+        if (action === 'whoami') return sess;
+        var h = ROLES[sess.role] && ROLES[sess.role][action];
+        if (!h) fail('ไม่มีสิทธิ์ใช้งานคำสั่งนี้');
+        return h(p, sess, token);
+      },
+      ensureAll: function () { for (var t in SCHEMA) db.ensure(t); ensureAdmin(); if (!setting('max_members', '')) setSetting('max_members', '5'); },
+      resetAdmin: function () { setSetting('admin_hash', env.hash(DEFAULT_ADMIN)); },
+      db: db
+    };
+  }
+
+  return { create: create, SCHEMA: SCHEMA };
+})();
+
+/* โหมดตัวอย่าง: จำลองเซิร์ฟเวอร์ด้วยโค้ดชุดเดียวกับ Code.gs แต่เก็บข้อมูลในเบราว์เซอร์ */
+window.MockServer = (function () {
+  var KEY = 'pbl3_demo_db_v1';
+  var data = null;
+  try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+  function now() { var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()); }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
+  function hash(t) { var h = 2166136261; t = 'pbl3::' + t; for (var i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(16); }
+  function uid() { return Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2); }
+
+  function seed() {
+    var units = JSON.stringify([
+      { no: '1', name: 'การวัดแรงดันและกระแสไฟฟ้า', pbl: false },
+      { no: '2', name: 'เซนเซอร์และการวัดความชื้น', pbl: true },
+      { no: '3', name: 'การควบคุมด้วยไมโครคอนโทรลเลอร์', pbl: true },
+      { no: '4', name: 'ความปลอดภัยในงานไฟฟ้า', pbl: false }
+    ]);
+    var units2 = JSON.stringify([
+      { no: '1', name: 'วงจรไฟฟ้าในอาคาร', pbl: false },
+      { no: '2', name: 'การวัดพลังงานไฟฟ้า', pbl: true },
+      { no: '3', name: 'การประหยัดพลังงาน', pbl: false }
+    ]);
+    var T = '2026-10-20 10:15:00';
+    function pr(g, track, step, sub, status, work, rs, rc) {
+      return { group_id: g, track: track, step: String(step), sub: String(sub), status: status, work: work || '', link: '', updated_by: g === 'GDEMO1' ? '66201010001' : '66201010005', updated_at: T, review_status: rs || '', review_comment: rc || '', score: '', reviewed_at: rs && rs !== 'pending' ? T : '' };
+    }
+    var progress = [
+      pr('GDEMO1', 'P', 1, 1, 'done', 'เป้าหมาย: วัดความชื้นในดินได้ ต่อเซนเซอร์กับบอร์ดได้ เขียนโปรแกรมสั่งปั๊มน้ำได้'),
+      pr('GDEMO1', 'P', 1, 2, 'done', 'วัสดุ: เซนเซอร์ความชื้นในดิน 2 ตัว บอร์ดไมโครคอนโทรลเลอร์ รีเลย์ ปั๊มน้ำ 12V (ต้องจัดหา)'),
+      pr('GDEMO1', 'P', 1, 3, 'done', 'งบประมาณประมาณ 850 บาท ใช้เวลา 8 สัปดาห์ ความเสี่ยง: ไฟฟ้ากับน้ำ ต้องแยกกล่องวงจร'),
+      pr('GDEMO1', 'P', 1, 4, 'done', 'ธนากร หัวหน้า/วงจร · พิมพ์ชนก เอกสาร · อนุชา ชิ้นงานและทดสอบ'),
+      pr('GDEMO1', 'P', 2, 1, 'done', 'สัมภาษณ์แปลงผักของวิทยาลัย 3 คน ปัญหา: รดน้ำไม่สม่ำเสมอช่วงวันหยุด'),
+      pr('GDEMO1', 'P', 2, 2, 'done', ''), pr('GDEMO1', 'P', 2, 3, 'done', ''), pr('GDEMO1', 'P', 2, 4, 'done', ''), pr('GDEMO1', 'P', 2, 5, 'done', ''),
+      pr('GDEMO1', 'P', 2, 6, 'submitted', 'เสนอหัวข้อ เครื่องรดน้ำผักอัตโนมัติด้วยเซนเซอร์ความชื้นในดิน', 'approved', 'อนุมัติหัวข้อ ให้กำหนดค่าความชื้นเป้าหมายให้ชัดในเค้าโครง'),
+      pr('GDEMO1', 'P', 3, 1, 'done', 'หลักการเซนเซอร์แบบความต้านทาน, การทำงานของรีเลย์, ความต้องการน้ำของผักบุ้ง'),
+      pr('GDEMO1', 'P', 3, 2, 'doing', ''),
+      pr('GDEMO1', 'R', 1, 0, 'done', 'Project Brief ฉบับร่าง'),
+      pr('GDEMO1', 'R', 2, 0, 'doing', ''),
+      pr('GDEMO2', 'P', 1, 1, 'done', ''), pr('GDEMO2', 'P', 1, 2, 'done', ''), pr('GDEMO2', 'P', 1, 3, 'done', ''), pr('GDEMO2', 'P', 1, 4, 'done', ''),
+      pr('GDEMO2', 'P', 2, 1, 'done', ''), pr('GDEMO2', 'P', 2, 2, 'done', ''), pr('GDEMO2', 'P', 2, 3, 'done', ''), pr('GDEMO2', 'P', 2, 4, 'done', ''), pr('GDEMO2', 'P', 2, 5, 'done', ''),
+      pr('GDEMO2', 'P', 2, 6, 'submitted', 'ชื่อโครงงาน: ระบบแจ้งเตือนการใช้ไฟฟ้าเกินในห้องพัก\nปัญหา: ผู้พักไม่รู้ปริมาณไฟที่ใช้จนบิลมาถึง (สำรวจ 24 ห้อง พบ 17 ห้องต้องการรู้ยอดรายวัน)\nชิ้นงาน: กล่องวัดพลังงานพร้อมแจ้งเตือนผ่านโทรศัพท์\nทดสอบ: เทียบค่ากับมิเตอร์มาตรฐาน 10 ครั้ง\nงบประมาณ: ประมาณ 1,200 บาท / 8 สัปดาห์', 'pending', '')
+    ];
+    return {
+      tables: {
+        students: [
+          { student_id: '66201010001', name: 'นายธนากร มีสุข', phone: '0812345601', level: 'ปวช.3', department: 'ช่างไฟฟ้ากำลัง', group_id: 'GDEMO1', created_at: T },
+          { student_id: '66201010002', name: 'นางสาวพิมพ์ชนก แก้วใส', phone: '0812345602', level: 'ปวช.3', department: 'ช่างไฟฟ้ากำลัง', group_id: 'GDEMO1', created_at: T },
+          { student_id: '66201010003', name: 'นายอนุชา ทองดี', phone: '0812345603', level: 'ปวช.3', department: 'ช่างไฟฟ้ากำลัง', group_id: 'GDEMO1', created_at: T },
+          { student_id: '66201010004', name: 'นางสาวกมลวรรณ ศรีสุข', phone: '0812345604', level: 'ปวช.3', department: 'ช่างไฟฟ้ากำลัง', group_id: '', created_at: T },
+          { student_id: '66201010005', name: 'นายกิตติพงษ์ สายลม', phone: '0812345605', level: 'ปวช.3', department: 'ช่างไฟฟ้ากำลัง', group_id: 'GDEMO2', created_at: T },
+          { student_id: '66201010006', name: 'นางสาวอรอุมา ใจงาม', phone: '0812345606', level: 'ปวช.3', department: 'ช่างไฟฟ้ากำลัง', group_id: 'GDEMO2', created_at: T }
+        ],
+        teachers: [
+          { teacher_id: 'T001', name: 'ครูสมศรี ใจดี', phone: '0899990001', department: 'แผนกวิชาช่างไฟฟ้ากำลัง', created_at: T },
+          { teacher_id: 'T002', name: 'ครูวิชัย ช่างคิด', phone: '0899990002', department: 'แผนกวิชาเทคโนโลยีสารสนเทศ', created_at: T }
+        ],
+        groups: [
+          { group_id: 'GDEMO1', project_name: 'เครื่องรดน้ำผักอัตโนมัติด้วยเซนเซอร์ความชื้นในดิน', project_type: 'สิ่งประดิษฐ์/นวัตกรรม', format: 'รูปแบบที่ 3 จัดเฉพาะบางหน่วยการเรียนรู้', subject_code: '20104-2104', subject_name: 'เครื่องมือวัดไฟฟ้าและอิเล็กทรอนิกส์', units: units, teacher_id: 'T001', lesson_done: '1', created_by: '66201010001', created_at: T, updated_at: T },
+          { group_id: 'GDEMO2', project_name: 'ระบบแจ้งเตือนการใช้ไฟฟ้าเกินในห้องพัก', project_type: 'สิ่งประดิษฐ์/นวัตกรรม', format: 'รูปแบบที่ 3 จัดเฉพาะบางหน่วยการเรียนรู้', subject_code: '20104-2004', subject_name: 'การติดตั้งไฟฟ้าในอาคาร', units: units2, teacher_id: 'T001', lesson_done: '1', created_by: '66201010005', created_at: T, updated_at: T }
+        ],
+        progress: progress, settings: [], logs: []
+      },
+      sessions: {}
+    };
+  }
+  if (!data || !data.tables) data = seed();
+
+  function makeDB(SCHEMA) {
+    function tb(t) { return data.tables[t] || (data.tables[t] = []); }
+    function copy(o) { return Object.assign({}, o); }
+    return {
+      all: function (t) { return tb(t).map(copy); },
+      insert: function (t, o) { var f = {}; SCHEMA[t].cols.forEach(function (c) { f[c[0]] = o[c[0]] !== undefined ? String(o[c[0]]) : ''; }); tb(t).push(f); save(); return copy(f); },
+      update: function (t, pred, patch) { var n = 0; tb(t).forEach(function (o) { if (pred(copy(o))) { for (var k in patch) o[k] = String(patch[k]); n++; } }); save(); return n; },
+      remove: function (t, pred) { var b = tb(t).length; data.tables[t] = tb(t).filter(function (o) { return !pred(copy(o)); }); save(); return b - data.tables[t].length; },
+      ensure: function () {}
+    };
+  }
+  var core = Core.create({
+    makeDB: makeDB,
+    session: {
+      put: function (t, o) { data.sessions[t] = o; save(); },
+      get: function (t) { return data.sessions[t] || null; },
+      del: function (t) { delete data.sessions[t]; save(); }
+    },
+    hash: hash, now: now, uid: uid
+  });
+  core.ensureAll();
+  return {
+    api: function (a, p, t) {
+      try { return { ok: true, data: JSON.parse(JSON.stringify(core.handle(a, p, t))) }; }
+      catch (e) { return { ok: false, error: e.message }; }
+    },
+    reset: function () { try { localStorage.removeItem(KEY); sessionStorage.clear(); } catch (e) {} }
+  };
+})();
+
+</script>
+
+<script>
+/* ======================== เนื้อหาตามคู่มือ ======================== */
+const PROJECT_TYPES = [
+  {id:'สิ่งประดิษฐ์/นวัตกรรม', d:'สร้างเครื่องมือ อุปกรณ์ หรือกลไกใหม่เพื่อแก้ปัญหาในงานอาชีพ'},
+  {id:'พัฒนาผลิตภัณฑ์หรือบริการ', d:'ปรับปรุงสินค้า อาหาร บรรจุภัณฑ์ หรือรูปแบบบริการให้ดีขึ้น'},
+  {id:'ซอฟต์แวร์/สื่อดิจิทัล', d:'พัฒนาแอป เว็บไซต์ ระบบสารสนเทศ หรือสื่อดิจิทัล'},
+  {id:'ทดลอง', d:'ทดสอบตัวแปรเพื่อหาผลหรือสูตรที่เหมาะสม มีการควบคุมตัวแปร'},
+  {id:'สำรวจ/ศึกษาค้นคว้า', d:'เก็บข้อมูลจากพื้นที่จริงหรือกลุ่มเป้าหมาย แล้ววิเคราะห์สรุป'},
+  {id:'ธุรกิจ/อาชีพ', d:'วางแผนและทดลองดำเนินธุรกิจหรือบริการจริงในวิทยาลัยหรือชุมชน'}
+];
+
+const P_STEPS = [
+ {no:1,title:'การเตรียมความพร้อม',pages:'6–7',subs:[
+  {t:'วิเคราะห์รายวิชาและกำหนดเป้าหมายการเรียนรู้',d:'อ่านคำอธิบายรายวิชา สมรรถนะ และหน่วยที่เลือกจัดแบบโครงงาน แล้วสรุปว่าโครงงานนี้ต้องฝึกความรู้และทักษะอะไร',
+   p:'ฉันเป็นผู้เรียนระดับ [ระดับชั้น] สาขา [สาขาวิชา] เรียนรายวิชา [รายวิชา] โดยหน่วยที่จัดแบบโครงงานคือ [หน่วยการเรียนรู้]\nคำอธิบายรายวิชา/สมรรถนะรายวิชา: [วางคำอธิบายรายวิชาหรือสมรรถนะ]\n\nช่วยวิเคราะห์ว่าหน่วยดังกล่าวต้องการให้ผู้เรียนเกิดความรู้ ทักษะ และคุณลักษณะอะไรบ้าง แล้วเขียนเป้าหมายการเรียนรู้ของโครงงาน 3–5 ข้อที่วัดผลได้ ในรูปตาราง: เป้าหมาย | หลักฐานที่แสดงว่าบรรลุ'},
+  {t:'เตรียมแหล่งเรียนรู้ ข้อมูล วัสดุและอุปกรณ์',d:'ทำรายการสิ่งที่ต้องใช้ทั้งหมด และแยกว่าอะไรมีแล้ว อะไรต้องจัดหา',
+   p:'โครงงานของกลุ่มเราอยู่ในรายวิชา [รายวิชา] ประเภท [ประเภทโครงงาน] แนวคิดเบื้องต้นคือ [แนวคิดหรือปัญหาที่สนใจ]\n\nช่วยจัดทำรายการแหล่งเรียนรู้ (เอกสาร เว็บไซต์หน่วยงาน ผู้เชี่ยวชาญ สถานประกอบการ) และวัสดุอุปกรณ์ที่ต้องเตรียม เป็นตาราง: รายการ | ใช้ทำอะไร | หาได้จากที่ไหน | มีอยู่แล้ว/ต้องจัดหา\nห้ามสร้างชื่อเอกสารหรือ URL ขึ้นเอง ถ้าไม่แน่ใจให้บอกคำค้นที่ควรใช้แทน'},
+  {t:'ประเมินงบประมาณ ระยะเวลา และความปลอดภัย',d:'ประมาณค่าใช้จ่าย เวลา และความเสี่ยงในการปฏิบัติงาน ก่อนเลือกหัวข้อจริง',
+   p:'จากรายการวัสดุอุปกรณ์นี้ [วางรายการวัสดุอุปกรณ์] เวลาที่มีประมาณ [จำนวนสัปดาห์] สัปดาห์ และงบประมาณไม่เกิน [จำนวนเงิน] บาท\n\nช่วยประเมินว่า\n1) งบพอหรือไม่ พร้อมตารางประมาณการค่าใช้จ่าย\n2) งานใดใช้เวลามากที่สุด\n3) ความเสี่ยงด้านความปลอดภัยในการปฏิบัติงานและวิธีป้องกัน\nให้ระบุราคาเป็น "ราคาประมาณ" และเตือนให้ผู้เรียนตรวจสอบราคาจริงอีกครั้ง'},
+  {t:'แบ่งกลุ่ม กำหนดบทบาท และร่วมกันกำหนดเกณฑ์ประเมิน',d:'ตกลงบทบาทของสมาชิกแต่ละคน และเกณฑ์ที่ใช้ประเมินงานกลุ่มร่วมกับครู',
+   p:'กลุ่มเรามีสมาชิก [จำนวนสมาชิก] คน คือ [รายชื่อสมาชิก]\nความถนัดของแต่ละคน: [ชื่อ – ความถนัด]\n\nช่วยเสนอการแบ่งบทบาท (เช่น หัวหน้ากลุ่ม ผู้ดูแลเอกสาร ผู้ดูแลชิ้นงาน ผู้นำเสนอ) ให้เหมาะกับความถนัด และร่างเกณฑ์ประเมินการทำงานกลุ่ม 4 ระดับ (ดีมาก ดี พอใช้ ปรับปรุง) อย่างน้อย 4 ด้าน ให้กลุ่มนำไปตกลงกับครู'}
+ ]},
+ {no:2,title:'การกำหนดและเลือกหัวข้อ',pages:'8–14',subs:[
+  {t:'สำรวจปัญหาในชุมชนหรือสถานประกอบการ',d:'หาปัญหาจริงจากผู้ใช้จริง ไม่ใช่ปัญหาที่คิดขึ้นเอง',
+   p:'ฉันเรียนสาขา [สาขาวิชา] ต้องการหาปัญหาจริงจาก [ชุมชน/สถานประกอบการ/วิทยาลัย] ที่เกี่ยวกับ [หน่วยการเรียนรู้]\n\nช่วยออกแบบแบบสำรวจหรือคำถามสัมภาษณ์ 8–10 ข้อ เพื่อค้นหาปัญหาที่ผู้ใช้เจอจริง และบอกวิธีบันทึกคำตอบให้นำไปวิเคราะห์ต่อได้'},
+  {t:'ระดมความคิดและกำหนดหัวข้อโครงงาน',d:'นำปัญหาที่สำรวจได้มาคิดหัวข้อหลาย ๆ ทาง ก่อนเลือก',
+   p:'ผลการสำรวจพบปัญหาเหล่านี้: [วางปัญหาที่พบ]\n\nช่วยเสนอหัวข้อโครงงานประเภท [ประเภทโครงงาน] ที่ตรงกับรายวิชา [รายวิชา] จำนวน 5 หัวข้อ แต่ละหัวข้อบอก: ปัญหาที่แก้ ชิ้นงานหรือผลลัพธ์ที่จะได้ และผู้ได้รับประโยชน์ ตั้งชื่อหัวข้อให้กระชับ ชัดเจน'},
+  {t:'วิเคราะห์สาเหตุของปัญหาและความต้องการของผู้ใช้',d:'หาสาเหตุที่แท้จริง และเขียนความต้องการของผู้ใช้ให้ชัด',
+   p:'หัวข้อที่สนใจคือ [หัวข้อ] ปัญหาหลักคือ [ปัญหา]\n\nช่วยวิเคราะห์สาเหตุของปัญหาด้วยแผนภาพก้างปลา (คน เครื่องมือ วิธีการ วัสดุ สภาพแวดล้อม) และสรุปความต้องการของผู้ใช้ในรูป "ผู้ใช้ต้องการ ... เพื่อ ..." อย่างน้อย 3 ข้อ โดยแยกว่าข้อใดมาจากข้อมูลสำรวจจริง ข้อใดเป็นการคาดการณ์'},
+  {t:'ตรวจสอบผลงานที่มีอยู่แล้ว',d:'ค้นหาผลงานที่คล้ายกัน เพื่อไม่ทำซ้ำและหาจุดที่ทำให้ดีกว่าได้',
+   p:'ช่วยแนะนำคำค้นภาษาไทยและภาษาอังกฤษสำหรับค้นหาโครงงาน งานวิจัย หรือผลิตภัณฑ์ที่คล้ายกับ [หัวข้อ] และสร้างตารางเปล่าให้กลุ่มกรอก: ชื่อผลงาน | แหล่งที่มา | จุดเด่น | ข้อจำกัด | สิ่งที่โครงงานเราจะทำต่างออกไป\nห้ามแต่งชื่อผลงานหรือแหล่งอ้างอิงขึ้นเอง'},
+  {t:'วิเคราะห์ความเป็นไปได้ ความคุ้มค่า และเลือกหัวข้อ',d:'ให้คะแนนหัวข้อที่เป็นตัวเลือก แล้วตัดสินใจร่วมกันในกลุ่ม',
+   p:'หัวข้อที่เป็นตัวเลือกคือ [หัวข้อ 1], [หัวข้อ 2], [หัวข้อ 3] กลุ่มมีเวลา [จำนวนสัปดาห์] สัปดาห์ งบประมาณ [จำนวนเงิน] บาท\n\nช่วยสร้างตารางให้คะแนน 1–5 ในด้าน ความเป็นไปได้ทางเทคนิค ต้นทุน เวลา ประโยชน์ต่อผู้ใช้ ความสอดคล้องกับรายวิชา และความปลอดภัย พร้อมเหตุผลสั้น ๆ แล้วสรุปหัวข้อที่เหมาะที่สุด (กลุ่มจะตรวจคะแนนและตัดสินใจเอง)'},
+  {t:'นำเสนอครูเพื่อขอความเห็นชอบ',cp:true,d:'ส่งสรุปหัวข้อให้ครูตรวจ เมื่อครูอนุมัติแล้วจึงเริ่มขั้นที่ 3 ได้',
+   p:'ช่วยสรุปหัวข้อโครงงาน [ชื่อโครงงาน] เป็นเอกสาร 1 หน้าสำหรับเสนอครู ประกอบด้วย ชื่อโครงงาน ปัญหาและที่มา ผู้ใช้ เป้าหมาย ชิ้นงานที่จะได้ วิธีทดสอบความสำเร็จ งบประมาณและเวลาโดยประมาณ และคำถามที่กลุ่มอยากถามครู\nข้อมูลของกลุ่ม: [วางข้อมูลจากขั้น 2.1–2.5]'}
+ ]},
+ {no:3,title:'การเขียนเค้าโครงของโครงงาน',pages:'15–22',gate:{step:2,sub:6},subs:[
+  {t:'ศึกษาทฤษฎี หลักการ และงานที่เกี่ยวข้อง',d:'รู้ว่าโครงงานใช้ความรู้อะไร และต้องหาแหล่งอ้างอิงเรื่องใด',
+   p:'โครงงาน [ชื่อโครงงาน] เกี่ยวข้องกับหลักการหรือเทคโนโลยี [ระบุหลักการ]\n\nช่วยอธิบายทฤษฎีหรือหลักการที่ต้องรู้ 4–6 หัวข้อ แต่ละหัวข้อบอกว่าจะใช้ในโครงงานส่วนใด และแนะนำประเภทแหล่งข้อมูลที่ควรค้นเพื่ออ้างอิง (ตำรา มาตรฐาน งานวิจัย) โดยไม่สร้างรายการอ้างอิงปลอม'},
+  {t:'กำหนดที่มาและความสำคัญของปัญหา',d:'เขียนให้เห็นสภาพปัญหาจากข้อมูลจริง ผลกระทบ และแนวทางแก้',
+   p:'ช่วยเรียบเรียงที่มาและความสำคัญของโครงงาน [ชื่อโครงงาน] 3 ย่อหน้า\n(1) สภาพปัญหาจากข้อมูลจริง: [ข้อมูลหรือตัวเลขจากการสำรวจ]\n(2) ผลกระทบของปัญหา\n(3) แนวทางที่กลุ่มเลือกแก้ไข\nใช้ภาษาวิชาการที่เข้าใจง่าย และทำเครื่องหมาย [ต้องอ้างอิง] ในประโยคที่ต้องมีแหล่งอ้างอิง'},
+  {t:'เขียนวัตถุประสงค์ ขอบเขต และสมมติฐาน (ถ้ามี)',d:'วัตถุประสงค์ทุกข้อต้องวัดผลได้ และขอบเขตต้องชัด',
+   p:'จากที่มาและความสำคัญนี้ [วางข้อความที่มาและความสำคัญ]\n\nช่วยเขียน\n1) วัตถุประสงค์ 2–3 ข้อ ขึ้นต้นด้วยคำกริยาที่วัดได้ (เพื่อสร้าง / เพื่อพัฒนา / เพื่อศึกษา / เพื่อหาประสิทธิภาพ)\n2) ขอบเขตด้านชิ้นงาน กลุ่มเป้าหมาย ตัวแปร พื้นที่ และระยะเวลา\n3) สมมติฐาน (ถ้าโครงงานประเภท [ประเภทโครงงาน] ต้องมี)\nแล้วตรวจว่าวัตถุประสงค์แต่ละข้อมีวิธีวัดผลรองรับ'},
+  {t:'วางแผนวิธีดำเนินงานและกำหนดงบประมาณ',d:'ออกแบบขั้นตอน เครื่องมือเก็บข้อมูล สถิติ และงบประมาณ',
+   p:'วัตถุประสงค์ของโครงงานคือ [วางวัตถุประสงค์]\n\nช่วยออกแบบวิธีดำเนินงานเป็นขั้นตอน ระบุ เครื่องมือ/วัสดุ วิธีสร้างหรือทดลอง วิธีเก็บข้อมูล เครื่องมือวัดผล (เช่น แบบประเมินความพึงพอใจ แบบบันทึกผลการทดลอง) และสถิติที่ใช้ (ร้อยละ ค่าเฉลี่ย ส่วนเบี่ยงเบนมาตรฐาน) พร้อมตารางงบประมาณ: รายการ | จำนวน | ราคาต่อหน่วย | รวม (ราคาประมาณ)'},
+  {t:'จัดทำแผนปฏิบัติงานและระยะเวลา',d:'ทำตารางเวลาที่ระบุผู้รับผิดชอบและจุดส่งครูตรวจ',
+   p:'ช่วยทำแผนปฏิบัติงานแบบแผนภูมิแกนต์ (Gantt chart) เป็นตาราง สำหรับเวลา [จำนวนสัปดาห์] สัปดาห์ เริ่ม [วันที่เริ่ม]\nกิจกรรม: [วางขั้นตอนวิธีดำเนินงาน]\nระบุผู้รับผิดชอบจากสมาชิก [รายชื่อสมาชิก] และจุดที่ต้องส่งครูตรวจ'},
+  {t:'จัดทำเอกสารอ้างอิงและตรวจสอบเค้าโครง',d:'จัดรูปแบบอ้างอิงจากแหล่งที่ค้นได้จริง และตรวจความสอดคล้องของเค้าโครง',
+   p:'นี่คือข้อมูลแหล่งอ้างอิงที่กลุ่มค้นได้จริง [วางข้อมูล: ผู้แต่ง ปี ชื่อเรื่อง แหล่งพิมพ์/URL]\nช่วยจัดรูปแบบตาม APA 7\n\nแล้วตรวจเค้าโครงต่อไปนี้ [วางเค้าโครง] ว่า ชื่อเรื่อง ที่มา วัตถุประสงค์ ขอบเขต วิธีดำเนินงาน และผลที่คาดว่าจะได้รับ สอดคล้องกันหรือไม่ บอกจุดที่ควรแก้เป็นข้อ ๆ'},
+  {t:'นำเสนอครูเพื่อขออนุมัติก่อนลงมือทำ',cp:true,d:'ส่งเค้าโครงฉบับสมบูรณ์ให้ครูอนุมัติ เมื่ออนุมัติแล้วจึงเริ่มขั้นที่ 4 ได้',
+   p:'ช่วยทำสรุปเค้าโครงโครงงาน [ชื่อโครงงาน] สำหรับนำเสนอครู 5 นาที เป็นหัวข้อสไลด์ 6–8 สไลด์ และเตรียมคำถามที่ครูน่าจะถาม 5 ข้อ พร้อมแนวคำตอบจากข้อมูลในเค้าโครงนี้ [วางเค้าโครง]'}
+ ]},
+ {no:4,title:'การปฏิบัติงานโครงงาน',pages:'23–27',gate:{step:3,sub:7},subs:[
+  {t:'ดำเนินงานตามเค้าโครงและแผนที่กำหนด',d:'แตกงานรายสัปดาห์ให้ทุกคนรู้ว่าต้องทำอะไร',
+   p:'แผนปฏิบัติงานของกลุ่มคือ [วางแผนปฏิบัติงาน] สัปดาห์นี้คือสัปดาห์ที่ [เลขสัปดาห์]\n\nช่วยแตกงานของสัปดาห์นี้เป็นเช็กลิสต์รายคนสำหรับ [รายชื่อสมาชิก] และบอกสิ่งที่ต้องเตรียมก่อนเริ่มลงมือ'},
+  {t:'สร้างหรือพัฒนาชิ้นงาน ทดลอง หรือเก็บข้อมูล',d:'ลงมือสร้างหรือทดลอง และใช้แบบบันทึกที่ออกแบบไว้',
+   p:'กลุ่มกำลังสร้าง/ทดลอง [ชิ้นงานหรือการทดลอง]\n\nช่วยออกแบบแบบบันทึกผลการทดลองหรือการทดสอบ (ตาราง): ครั้งที่ | วันที่ | เงื่อนไข | ค่าที่วัดได้ | หมายเหตุ และบอกวิธีทดสอบให้ได้ข้อมูลน่าเชื่อถือ (ทำซ้ำกี่ครั้ง ควบคุมตัวแปรอะไร)'},
+  {t:'บันทึกผลการดำเนินงานและปัญหาที่พบ',d:'บันทึกตามจริงทุกครั้ง รวมถึงครั้งที่ไม่สำเร็จ',
+   p:'นี่คือบันทึกการทำงานของกลุ่ม [วางบันทึกการทำงาน]\n\nช่วยจัดเป็นรายงานความก้าวหน้า: งานที่เสร็จ | ผลที่ได้ (ตัวเลขตามบันทึกจริงเท่านั้น) | ปัญหาที่พบ | สาเหตุ | แนวทางแก้ไข\nห้ามเพิ่มตัวเลขหรือผลที่ไม่มีในบันทึก'},
+  {t:'ตรวจสอบและปรับปรุงแก้ไขผลงาน',d:'เทียบผลทดสอบกับเกณฑ์ความสำเร็จ แล้วปรับปรุง',
+   p:'ชิ้นงานของเราตอนนี้ [อธิบายสภาพชิ้นงาน] ผลทดสอบล่าสุด [วางผลทดสอบ] เป้าหมายคือ [เกณฑ์ความสำเร็จ]\n\nช่วยวิเคราะห์ว่ายังไม่ถึงเป้าตรงไหน สาเหตุที่เป็นไปได้ และเสนอการปรับปรุง 3 ทาง เรียงตามความง่ายและต้นทุน'},
+  {t:'ติดตามความก้าวหน้าและปรึกษาครู',cp:true,d:'ส่งรายงานความก้าวหน้าให้ครูให้คำแนะนำ',
+   p:'ช่วยเขียนสรุปความก้าวหน้าสั้น ๆ สำหรับรายงานครูประจำสัปดาห์ของโครงงาน [ชื่อโครงงาน]: ความก้าวหน้า (%) เทียบกับแผน งานที่เสร็จ งานค้าง และปัญหาที่ต้องการคำแนะนำ จากข้อมูลนี้ [วางข้อมูลความก้าวหน้า]'}
+ ]},
+ {no:5,title:'การนำเสนอผลงาน',pages:'28–33',subs:[
+  {t:'สรุปผลการดำเนินงานและข้อค้นพบ',d:'สรุปผลตามวัตถุประสงค์ทีละข้อจากข้อมูลจริง',
+   p:'ข้อมูลผลการดำเนินงาน/ผลการทดลองจริงคือ [วางข้อมูล] วัตถุประสงค์คือ [วางวัตถุประสงค์]\n\nช่วยสรุปผลตามวัตถุประสงค์ทีละข้อ คำนวณค่าสถิติที่เหมาะสม และแสดงวิธีคำนวณให้ตรวจได้ ห้ามปรับตัวเลข'},
+  {t:'จัดทำรายงานโครงงาน',d:'เขียนเล่มรายงาน 5 บทตามแท็บ "เขียนเล่มรายงาน 11 ขั้น" แล้วตรวจองค์ประกอบของเล่ม',
+   p:'ช่วยตรวจว่ารายงานโครงงานของเรามีองค์ประกอบครบหรือไม่: ปก บทคัดย่อ กิตติกรรมประกาศ สารบัญ บทที่ 1–5 บรรณานุกรม ภาคผนวก\nสารบัญปัจจุบัน: [วางสารบัญ]\nบอกส่วนที่ขาดและลำดับที่ควรเป็น'},
+  {t:'เตรียมสื่อและเอกสารนำเสนอ',d:'ทำสไลด์และโปสเตอร์จากผลจริงในรายงาน',
+   p:'ช่วยวางโครงสไลด์นำเสนอโครงงาน [ชื่อโครงงาน] เวลา [จำนวนนาที] นาที จำนวน 8–10 สไลด์ (ปัญหา วัตถุประสงค์ วิธีดำเนินงาน ชิ้นงาน ผลการทดลอง สรุป ข้อเสนอแนะ) และร่างข้อความโปสเตอร์ A3 1 แผ่น จากสรุปผลนี้ [วางสรุปผล] ใช้ตัวเลขตามข้อมูลจริงเท่านั้น'},
+  {t:'นำเสนอหรือสาธิตผลงาน',d:'ซ้อมการนำเสนอและสาธิตชิ้นงานจริง',
+   p:'ช่วยเขียนสคริปต์สาธิตชิ้นงาน [ชิ้นงาน] เวลา [จำนวนนาที] นาที แบ่งบทพูดให้สมาชิก [รายชื่อสมาชิก] และระบุสิ่งที่ต้องเตรียมเผื่อการสาธิตขัดข้อง'},
+  {t:'ตอบคำถามและรับข้อเสนอแนะ',cp:true,d:'ซ้อมตอบคำถาม และบันทึกข้อเสนอแนะจากครูหรือกรรมการ',
+   p:'จากข้อมูลโครงงานนี้ [วางสรุปโครงงาน]\n\nช่วยตั้งคำถามที่กรรมการอาจถาม 10 ข้อ ครอบคลุม ปัญหา วิธีการ ผลลัพธ์ ข้อจำกัด ต้นทุน และการต่อยอด พร้อมแนวคำตอบที่อิงข้อมูลจริง และสร้างตารางบันทึกข้อเสนอแนะที่ได้รับ'}
+ ]},
+ {no:6,title:'การประเมินโครงงาน',pages:'34–40',subs:[
+  {t:'ประเมินความพร้อมก่อนเริ่มทำโครงงาน',d:'ประเมินตนเองว่ากลุ่มพร้อมแค่ไหนก่อนลงมือ',
+   p:'ช่วยสร้างแบบประเมินตนเองความพร้อมก่อนเริ่มโครงงาน 10 ข้อ (มาตราส่วน 1–5) ด้านความรู้พื้นฐาน วัสดุอุปกรณ์ เวลา การแบ่งงาน และความปลอดภัย สำหรับโครงงาน [ชื่อโครงงาน]'},
+  {t:'ประเมินความก้าวหน้าและกระบวนการทำงานระหว่างดำเนินงาน',d:'ประเมินการทำงานกลุ่มระหว่างทาง เพื่อแก้ไขได้ทันเวลา',
+   p:'ช่วยทำแบบประเมินกระบวนการทำงานกลุ่มระหว่างดำเนินงาน (ทำตามแผน การบันทึกข้อมูล การแก้ปัญหา การสื่อสาร) แบบรูบริก 4 ระดับ และสรุปผลจากคะแนนที่กลุ่มให้ตนเองนี้ [วางคะแนน]'},
+  {t:'ประเมินชิ้นงาน ผลงาน และการนำเสนอ',cp:true,d:'ครูประเมินชิ้นงานและการนำเสนอตามเกณฑ์ที่ตกลงกันไว้',
+   p:'ช่วยร่างเกณฑ์ประเมินชิ้นงานและการนำเสนอโครงงานประเภท [ประเภทโครงงาน] แบบรูบริก 4 ระดับ ด้าน ความคิดสร้างสรรค์ ประโยชน์ใช้งาน คุณภาพชิ้นงาน ความถูกต้องของข้อมูล และการนำเสนอ'},
+  {t:'ประเมินการเรียนรู้ ทักษะ และการทำงานร่วมกัน',d:'สมาชิกแต่ละคนสะท้อนสิ่งที่ได้เรียนรู้',
+   p:'ช่วยตั้งคำถามสะท้อนคิด 6 ข้อ ให้สมาชิกแต่ละคนตอบว่าได้เรียนรู้อะไรจากโครงงาน [ชื่อโครงงาน] ทักษะวิชาชีพที่พัฒนาขึ้น และบทบาทในการทำงานร่วมกัน\nแล้วสรุปคำตอบของสมาชิกนี้ [วางคำตอบของสมาชิก] เป็นภาพรวมของกลุ่ม'},
+  {t:'สรุปผลการประเมินและข้อเสนอแนะเพื่อพัฒนา',cp:true,d:'สรุปจุดแข็ง จุดที่ควรพัฒนา และแผนสำหรับครั้งต่อไป',
+   p:'ผลการประเมินของกลุ่มจากครูและการประเมินตนเองคือ [วางผลการประเมิน]\n\nช่วยสรุปจุดแข็ง 3 ข้อ จุดที่ควรพัฒนา 3 ข้อ และแผนพัฒนาสำหรับโครงงานครั้งต่อไป'}
+ ]}
+];
+
+const R_STEPS = [
+ {no:1,t:'คิดหัวข้อและเขียน Project Brief',task:'ระบุปัญหา ที่มา วัตถุประสงค์ ชิ้นงาน วิธีทดสอบ และคำค้นสำหรับอ้างอิง',teacher:'',
+  p:'ช่วยเขียน Project Brief 1 หน้าสำหรับโครงงาน [ชื่อโครงงาน] ประเภท [ประเภทโครงงาน] รายวิชา [รายวิชา]\nหัวข้อ: ปัญหา | ที่มา | วัตถุประสงค์ | ชิ้นงานที่จะได้ | วิธีทดสอบและเกณฑ์ความสำเร็จ | คำค้นภาษาไทยและอังกฤษ 8 คำสำหรับค้นแหล่งอ้างอิง\nข้อมูลของเรา: [วางข้อมูลจากเค้าโครง]'},
+ {no:2,t:'ค้นคว้าและรวบรวมแหล่งอ้างอิง',task:'ค้นหาทฤษฎี งานวิจัย และข้อมูลที่เกี่ยวข้อง ตรวจสอบความน่าเชื่อถือของแหล่งข้อมูล',teacher:'',
+  p:'นี่คือแหล่งข้อมูลที่กลุ่มค้นได้ [วางรายการแหล่งข้อมูลพร้อมลิงก์]\n\nช่วยประเมินความน่าเชื่อถือแต่ละแหล่ง (ผู้เขียน/หน่วยงาน ปีที่เผยแพร่ หลักฐานอ้างอิง) จัดกลุ่มตามหัวข้อทฤษฎีของบทที่ 2 และบอกหัวข้อที่ยังขาดแหล่งอ้างอิง ห้ามเพิ่มแหล่งที่ไม่ได้อยู่ในรายการ'},
+ {no:3,t:'เขียนรายงานบทที่ 1–3',task:'บทที่ 1 บทนำ, บทที่ 2 เอกสารและทฤษฎีที่เกี่ยวข้อง, บทที่ 3 วิธีดำเนินโครงงาน',teacher:'',
+  p:'ช่วยเรียบเรียงรายงานบทที่ [1/2/3] ของโครงงาน [ชื่อโครงงาน] จากข้อมูลนี้ [วางเค้าโครงและแหล่งอ้างอิง]\n- บทที่ 1 บทนำ: ที่มา วัตถุประสงค์ ขอบเขต นิยามศัพท์ ประโยชน์ที่คาดว่าจะได้รับ\n- บทที่ 2 เอกสารและทฤษฎี: อ้างอิงแบบ APA 7 ในเนื้อหา จากแหล่งที่ให้ไว้เท่านั้น\n- บทที่ 3 วิธีดำเนินโครงงาน: ขั้นตอน เครื่องมือ การเก็บข้อมูล สถิติ\nเขียนด้วยภาษาวิชาการ'},
+ {no:4,t:'ตรวจและแก้ไขบทที่ 1–3',cp:true,task:'ตรวจเนื้อหา ความสอดคล้อง ภาษา ความถูกต้อง และการอ้างอิง แล้วส่งครูตรวจ',teacher:'ตรวจเนื้อหา ความสอดคล้อง ภาษา และการอ้างอิงของบทที่ 1–3',
+  p:'ช่วยตรวจรายงานบทที่ 1–3 นี้ [วางเนื้อหาบทที่ 1–3] ตามรายการ:\n- วัตถุประสงค์ ขอบเขต และวิธีดำเนินงานสอดคล้องกันหรือไม่\n- ทุกการอ้างอิงในเนื้อหามีในบรรณานุกรมหรือไม่\n- ภาษาและการสะกดคำ\n- ประโยคที่กล่าวอ้างโดยไม่มีแหล่งอ้างอิง\nตอบเป็นตาราง: ตำแหน่ง | ปัญหา | ข้อเสนอการแก้ไข'},
+ {no:5,t:'เขียนบทที่ 4 ผลการดำเนินโครงงาน',task:'บันทึกและนำเสนอผลการดำเนินงานหรือผลการทดลองตามข้อมูลจริง',teacher:'',
+  p:'ช่วยเขียนบทที่ 4 ผลการดำเนินโครงงาน จากข้อมูลจริงนี้ [วางตารางผลการทดลอง/ผลการประเมิน] เรียงตามวัตถุประสงค์ [วางวัตถุประสงค์]\nนำเสนอเป็นตารางพร้อมคำบรรยายใต้ตาราง รายงานเฉพาะสิ่งที่ข้อมูลแสดง ไม่อภิปรายหรือตีความเกินข้อมูล และห้ามแก้ตัวเลข'},
+ {no:6,t:'ส่งบทที่ 4 พร้อมข้อมูลผลจริงให้ตรวจ',cp:true,task:'แนบข้อมูลดิบ (ลิงก์) พร้อมบทที่ 4 แล้วส่งครูตรวจ',teacher:'ตรวจว่าผลตรงกับข้อมูล ไม่แต่งผล และไม่อภิปรายปน',
+  p:'ช่วยเทียบบทที่ 4 นี้ [วางบทที่ 4] กับข้อมูลดิบนี้ [วางข้อมูลดิบ]\nตัวเลขทุกจุดตรงกันหรือไม่ และมีประโยคใดเป็นการอภิปรายหรือตีความที่ควรย้ายไปบทที่ 5 ระบุเป็นรายการ'},
+ {no:7,t:'เขียนบทที่ 5 สรุปผล อภิปรายผล และข้อเสนอแนะ',task:'สรุปผล อภิปรายผล และเสนอแนะแนวทางพัฒนาต่อ',teacher:'',
+  p:'จากบทที่ 4 นี้ [วางบทที่ 4] และทฤษฎีในบทที่ 2 [วางหัวข้อทฤษฎีและแหล่งอ้างอิง]\n\nช่วยเขียนบทที่ 5: สรุปผลตามวัตถุประสงค์ทีละข้อ อภิปรายผลว่าเป็นเพราะอะไร สอดคล้องหรือแตกต่างกับทฤษฎีหรืองานที่เกี่ยวข้องอย่างไร ข้อจำกัด และข้อเสนอแนะ (การนำไปใช้ / การพัฒนาครั้งต่อไป)'},
+ {no:8,t:'รวมและตรวจรายงานบทที่ 1–5',cp:true,task:'ตรวจบทที่ 1–5 ความต่อเนื่องของเนื้อหา ตัวเลข และความครบถ้วนของรายงาน',teacher:'ตรวจความสอดคล้องทั้งเล่มและจัดทำเกณฑ์ประเมิน',
+  p:'ช่วยตรวจความสอดคล้องทั้งเล่มของรายงาน [วางสรุปแต่ละบท]\n- ชื่อเรื่อง วัตถุประสงค์ วิธีดำเนินงาน ผล และสรุป ตรงกันหรือไม่\n- ตัวเลขในบทคัดย่อ บทที่ 4 และบทที่ 5 ตรงกันหรือไม่\nแล้วร่างบทคัดย่อไม่เกิน 250 คำ จากข้อมูลจริงในรายงาน'},
+ {no:9,t:'จัดทำบรรณานุกรม',cp:true,task:'ตรวจรูปแบบ APA 7 ความครบถ้วนของข้อมูล และความตรงกันระหว่างการอ้างในเนื้อหากับรายการอ้างอิง',teacher:'ตรวจรูปแบบ APA 7 และความตรงกันของรายการอ้างอิง',
+  p:'ช่วยจัดรูปแบบบรรณานุกรม APA 7 ทั้งภาษาไทยและอังกฤษ จากรายการนี้ [วางรายการอ้างอิง] เรียงตามตัวอักษร\nแล้วเทียบกับการอ้างอิงในเนื้อหานี้ [วางรายการอ้างอิงในเนื้อหา] บอกรายการที่อ้างในเนื้อหาแต่ไม่มีในบรรณานุกรม และรายการที่มีในบรรณานุกรมแต่ไม่ถูกอ้าง'},
+ {no:10,t:'จัดทำชุดนำเสนอหรือประกวด',cp:true,task:'จัดทำสไลด์ โปสเตอร์ สื่อประกอบ และสคริปต์สำหรับอธิบายผลงาน',teacher:'ตรวจสไลด์ โปสเตอร์ สคริปต์ และเกณฑ์ประเมิน',
+  p:'ช่วยทำชุดนำเสนอจากรายงานโครงงาน [ชื่อโครงงาน]: โครงสไลด์ 10 หน้า ข้อความบนโปสเตอร์ และสคริปต์พูด [จำนวนนาที] นาที ตามเกณฑ์การประกวดนี้ [วางเกณฑ์ประเมิน]\nใช้ข้อมูลและตัวเลขจากรายงานเท่านั้น: [วางบทคัดย่อและผลสำคัญ]'},
+ {no:11,t:'ตรวจความพร้อมก่อนนำเสนอจริง',cp:true,task:'ซ้อมตอบคำถามเกี่ยวกับปัญหา วิธีดำเนินงาน ผลลัพธ์ ข้อจำกัด และจุดเด่นของโครงงาน',teacher:'ตรวจสื่อ ซ้อมตอบคำถาม และความสอดคล้องกับผลงานจริง',
+  p:'ช่วยทำหน้าที่กรรมการตัดสินโครงงาน ถามคำถามฉันทีละข้อ รวม 8 ข้อ เกี่ยวกับปัญหา วิธีดำเนินงาน ผลลัพธ์ ข้อจำกัด และจุดเด่นของโครงงาน [ชื่อโครงงาน]\nข้อมูลโครงงาน: [วางบทคัดย่อ]\nหลังฉันตอบแต่ละข้อ ให้ข้อเสนอแนะว่าคำตอบชัดเจนและตรงกับข้อมูลหรือไม่'}
+];
+
+const STATUS = {todo:'ยังไม่เริ่ม',doing:'กำลังทำ',done:'เสร็จแล้ว',submitted:'ส่งครูตรวจ'};
+const REVIEW = {pending:'รอครูตรวจ',approved:'ครูอนุมัติแล้ว',revise:'ครูให้แก้ไข'};
+
+/* ======================== state & API ======================== */
+const S = {token:'',role:'',data:null,view:'login',loginTab:'student',reg:null,ob:'lesson',quiz:{},
+  tab:'P',step:1,open:'',drafts:{},tGroup:null,tTab:'P',tStep:1,adminTab:'overview',adminQ:'',lookup:null,showAddTeacher:false,tFilter:''};
+const store = {
+  get(k){try{return sessionStorage.getItem(k)||''}catch(e){return ''}},
+  set(k,v){try{v?sessionStorage.setItem(k,v):sessionStorage.removeItem(k)}catch(e){}}
+};
+
+function call(action,payload){
+  return new Promise((resolve,reject)=>{
+    busy(true);
+    const done=r=>{busy(false); if(r&&r.ok) resolve(r.data); else { const m=(r&&r.error)||'เกิดข้อผิดพลาด'; if(m.indexOf('SESSION:')===0){ logoutLocal(); toast(m.slice(8).trim(),true); } reject(new Error(m.replace(/^SESSION:\s*/,''))); } };
+    if(window.google&&google.script&&google.script.run){
+      google.script.run.withSuccessHandler(done).withFailureHandler(e=>{busy(false);reject(new Error(e&&e.message||'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้'))}).api(action,payload||{},S.token);
+    } else if(window.MockServer){
+      setTimeout(()=>done(window.MockServer.api(action,payload||{},S.token)),120);
+    } else { busy(false); reject(new Error('ไม่พบเซิร์ฟเวอร์ (ต้องเปิดผ่าน Google Apps Script)')); }
+  });
+}
+let busyN=0;
+function busy(on){busyN+=on?1:-1; if(busyN<0)busyN=0; document.getElementById('busy').hidden=busyN===0}
+function toast(msg,err){const t=document.getElementById('toast');const d=document.createElement('div');if(err)d.className='err';d.textContent=msg;t.appendChild(d);setTimeout(()=>d.remove(),err?5000:2600)}
+const e=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+const val=id=>{const el=$(id);return el?el.value.trim():''};
+function act(fn){return fn().catch(err=>toast(err.message,true))}
+
+/* ======================== routing ======================== */
+function render(){
+  const app=$('app');
+  let html='';
+  if(S.view==='login') html=viewLogin();
+  else html=topbar()+(
+    S.view==='onboard'?viewOnboard():
+    S.view==='student'?viewStudent():
+    S.view==='teacher'?viewTeacher():
+    S.view==='admin'?viewAdmin():'');
+  app.innerHTML=html;
+  afterRender();
+}
+function afterRender(){
+  document.querySelectorAll('textarea[data-draft]').forEach(t=>{t.addEventListener('input',()=>{S.drafts[t.dataset.draft]=Object.assign(S.drafts[t.dataset.draft]||{},{work:t.value})})});
+  document.querySelectorAll('input[data-draftlink]').forEach(t=>{t.addEventListener('input',()=>{S.drafts[t.dataset.draftlink]=Object.assign(S.drafts[t.dataset.draftlink]||{},{link:t.value})})});
+}
+function logoutLocal(){S.token='';S.role='';S.data=null;S.view='login';S.drafts={};S.tGroup=null;store.set('pbl3_token','');render()}
+
+async function routeStudent(data){
+  S.data=data; S.role='student';
+  const b=data.bundle;
+  if(!b){ S.view='onboard'; if(['lesson','quiz','setup'].indexOf(S.ob)<0) S.ob='lesson'; if(store.get('pbl3_lesson')&&S.ob!=='setup') S.ob='setup'; }
+  else if(!b.group.teacher_id){ S.view='onboard'; S.ob='team'; }
+  else if(S.view!=='student'){ S.view='student'; pickDefaultStep(); }
+  render();
+}
+async function boot(){
+  if(window.MockServer) showDemoBanner();
+  const t=store.get('pbl3_token');
+  if(!t){render();return}
+  S.token=t;
+  try{
+    const sess=await call('whoami');
+    S.role=sess.role;
+    if(sess.role==='student') routeStudent(await call('me'));
+    else if(sess.role==='teacher'){S.data=await call('teacherHome');S.view='teacher';render()}
+    else if(sess.role==='admin'){S.data=await call('adminOverview');S.view='admin';render()}
+  }catch(err){logoutLocal()}
+}
+
+/* ======================== topbar ======================== */
+function topbar(){
+  let name='',role='';
+  if(S.role==='student'&&S.data){name=S.data.me.name;role='นักศึกษา · '+S.data.me.student_id}
+  if(S.role==='teacher'&&S.data){name=S.data.me.name;role='ครูผู้สอน'}
+  if(S.role==='admin'){name='ผู้ดูแลระบบ';role='หลังบ้าน'}
+  return `<header class="topbar"><div class="wrap">
+    <div class="brand"><div class="brand-mark">PBL</div><span class="full">ห้องโครงงาน</span></div>
+    <span class="spacer"></span>
+    <div class="who"><span class="who-name">${e(name)}</span><span class="role-tag">${e(role)}</span></div>
+    <button class="btn ghost sm" data-a="logout">ออกจากระบบ</button>
+  </div></header>`;
+}
+
+/* ======================== login ======================== */
+function viewLogin(){
+  const tab=S.loginTab, reg=S.reg;
+  let form='';
+  if(tab==='admin'){
+    form=`<div class="field"><label for="adminPw">รหัสผู้ดูแลระบบ</label><input class="input" id="adminPw" type="password" autocomplete="current-password"></div>
+    <button class="btn primary" data-a="loginAdmin">เข้าสู่ระบบหลังบ้าน</button>`;
+  } else if(reg){
+    const isT=tab==='teacher';
+    form=`<div class="note info">ยังไม่พบรหัส <b class="mono">${e(reg)}</b> ในระบบ กรอกข้อมูลเพื่อลงทะเบียนครั้งแรก</div>
+    <div class="field"><label for="rgName">ชื่อ-สกุล</label><input class="input" id="rgName" autocomplete="name" placeholder="${isT?'เช่น นางสาวสมศรี ใจดี':'เช่น นายธนากร มีสุข'}"></div>
+    <div class="field"><label for="rgPhone">เบอร์โทร</label><input class="input" id="rgPhone" inputmode="tel" autocomplete="tel" placeholder="0812345678"></div>
+    ${isT?`<div class="field"><label for="rgDept">แผนก/สาขา</label><input class="input" id="rgDept" placeholder="เช่น แผนกวิชาช่างไฟฟ้า"></div>`:
+    `<div class="grid2"><div class="field"><label for="rgLevel">ระดับชั้น</label><select class="input" id="rgLevel"><option>ปวช.1</option><option>ปวช.2</option><option selected>ปวช.3</option><option>ปวส.1</option><option>ปวส.2</option></select></div>
+     <div class="field"><label for="rgDept">สาขาวิชา</label><input class="input" id="rgDept" placeholder="เช่น ช่างยนต์"></div></div>`}
+    <div class="row"><button class="btn primary grow" data-a="register">ลงทะเบียนและเข้าสู่ระบบ</button><button class="btn ghost" data-a="cancelReg">ยกเลิก</button></div>`;
+  } else {
+    const isT=tab==='teacher';
+    form=`<div class="field"><label for="loginId">${isT?'รหัสครูผู้สอน':'รหัสนักศึกษา'}</label>
+      <input class="input mono" id="loginId" inputmode="${isT?'text':'numeric'}" autocomplete="username" placeholder="${isT?'เช่น T001':'เช่น 66201010001'}"></div>
+      <button class="btn primary" data-a="login">เข้าสู่ระบบ</button>
+      <p class="small muted">${isT?'ครูจะเห็นเฉพาะกลุ่มที่เลือกท่านเป็นครูผู้สอน':'สมาชิกคนใดในกลุ่มก็เข้าด้วยรหัสของตนเองได้ ทุกคนเห็นงานของกลุ่มเดียวกัน'}</p>
+      ${window.MockServer?`<p class="demo-ids">ลองรหัสตัวอย่าง: ${isT?'<button data-a="fill" data-v="T001">T001</button>':'<button data-a="fill" data-v="66201010001">66201010001</button> (มีกลุ่มแล้ว) · <button data-a="fill" data-v="66201010099">66201010099</button> (ผู้ใช้ใหม่)'}</p>`:''}`;
+  }
+  return `<main class="wrap login">
+    <section class="login-intro">
+      <div class="eyebrow">วิชาโครงงาน · ปวช./ปวส.</div>
+      <h1>ห้องโครงงาน PBL<br>รูปแบบที่ 3 จัดเฉพาะบางหน่วย</h1>
+      <p class="lead">เลือกหน่วยการเรียนรู้ที่เหมาะสมในรายวิชามาจัดแบบโครงงานเป็นฐาน หน่วยอื่นเรียนตามปกติ ทำงานเป็นกลุ่ม ใช้ Prompt AI ตามคู่มือทีละขั้น และส่งครูตรวจในจุดสำคัญ</p>
+      <div class="paths">
+        <div class="path"><div class="big">6</div><h3>ขั้นการทำโครงงาน</h3>
+          <ol><li>การเตรียมความพร้อม</li><li>การกำหนดและเลือกหัวข้อ</li><li>การเขียนเค้าโครง</li><li>การปฏิบัติงานโครงงาน</li><li>การนำเสนอผลงาน</li><li>การประเมินโครงงาน</li></ol></div>
+        <div class="path r"><div class="big">11</div><h3>ขั้นการเขียนเล่มรายงาน</h3>
+          <ol><li>Project Brief</li><li>ค้นคว้าแหล่งอ้างอิง</li><li>เขียนบทที่ 1–3</li><li>ตรวจบทที่ 1–3</li><li>…จนถึงตรวจความพร้อมก่อนนำเสนอจริง</li></ol></div>
+      </div>
+    </section>
+    <section class="card shadow stack" style="padding:24px">
+      <h2>เข้าสู่ระบบ</h2>
+      <div class="seg" role="tablist">
+        <button class="${tab==='student'?'on':''}" data-a="ltab" data-v="student">นักศึกษา</button>
+        <button class="${tab==='teacher'?'on':''}" data-a="ltab" data-v="teacher">ครูผู้สอน</button>
+        <button class="${tab==='admin'?'on':''}" data-a="ltab" data-v="admin">ผู้ดูแล</button>
+      </div>
+      <form class="stack" id="loginForm" onsubmit="return false">${form}</form>
+    </section>
+  </main>`;
+}
+
+/* ======================== onboarding ======================== */
+function obSteps(){
+  const order=['lesson','setup','team'];
+  const names={lesson:'บทเรียนก่อนเลือกรูปแบบ',setup:'ประเภทโครงงานและรูปแบบการจัด',team:'สมาชิกและครูผู้สอน'};
+  const cur=order.indexOf(S.ob==='quiz'?'lesson':S.ob);
+  return `<div class="ob-steps">${order.map((k,i)=>`<span class="${i===cur?'on':i<cur?'ok':''}">${names[k]}</span>`).join('')}</div>`;
+}
+function viewOnboard(){
+  let body='';
+  if(S.ob==='lesson'||S.ob==='quiz') body=viewLesson();
+  else if(S.ob==='setup') body=viewSetup(true);
+  else body=viewTeam(true);
+  return `<main class="wrap ob">${obSteps()}${body}</main>`;
+}
+const QUIZ=[
+ {q:'โครงงานรูปแบบที่ 3 หมายถึงข้อใด',a:['ทุกหน่วยในรายวิชาต้องทำเป็นโครงงาน','เลือกเฉพาะหน่วยที่เหมาะสมมาจัดแบบโครงงาน หน่วยอื่นสอนตามปกติ','ทำโครงงานนอกเวลาเรียนโดยไม่เกี่ยวกับรายวิชา'],c:1},
+ {q:'หน่วยการเรียนรู้แบบใดเหมาะจะนำมาจัดแบบโครงงานมากที่สุด',a:['หน่วยที่เน้นท่องจำนิยาม','หน่วยที่มีปัญหาจริงให้แก้ และได้ชิ้นงานหรือผลลัพธ์ที่วัดได้','หน่วยที่มีเวลาเรียนน้อยที่สุด'],c:1},
+ {q:'เมื่อ AI ให้ตัวเลขหรือแหล่งอ้างอิงมา กลุ่มควรทำอย่างไร',a:['ใช้ได้ทันทีเพราะ AI ค้นมาให้แล้ว','ตรวจสอบกับข้อมูลจริงและแหล่งต้นทางก่อนใช้ แล้วให้ครูตรวจในจุดสำคัญ','ลบตัวเลขทิ้งทั้งหมด'],c:1}
+];
+function viewLesson(){
+  const answered=QUIZ.every((_,i)=>S.quiz[i]!=null);
+  const correct=QUIZ.every((q,i)=>S.quiz[i]===q.c);
+  return `<div class="lesson">
+   <article>
+    <div class="stack"><div class="eyebrow">บทเรียนก่อนเลือกรูปแบบ · ใช้เวลาประมาณ 5 นาที</div>
+    <h1>โครงงานเป็นฐาน แบบจัดเฉพาะบางหน่วย</h1>
+    <p class="lead">ก่อนตั้งกลุ่มและเลือกหัวข้อ อ่านให้เข้าใจว่าในรายวิชานี้ เราจะทำโครงงานกับหน่วยไหน และทำงานผ่านระบบนี้อย่างไร</p></div>
+    <section><h2>1. รูปแบบที่ 3 คืออะไร</h2>
+     <p>ครูเลือก <b>บางหน่วยการเรียนรู้</b> ที่เหมาะสมในรายวิชามาจัดการเรียนรู้แบบโครงงานเป็นฐาน (Project-Based Learning) ผู้เรียนเรียนเนื้อหาของหน่วยนั้นผ่านการลงมือแก้ปัญหาจริงจนได้ชิ้นงาน ส่วน <b>หน่วยอื่นยังเรียนตามปกติ</b></p>
+     <div class="tablebox"><table class="compare"><thead><tr><th></th><th>หน่วยที่จัดแบบโครงงาน</th><th>หน่วยอื่น</th></tr></thead><tbody>
+      <tr><td>วิธีเรียน</td><td class="hl">ทำโครงงานเป็นกลุ่ม ตาม 6 ขั้น</td><td>เรียนตามแผนการสอนปกติ</td></tr>
+      <tr><td>ผลงาน</td><td class="hl">ชิ้นงาน/ผลการทดลอง และเล่มรายงาน</td><td>ใบงาน แบบฝึกหัด แบบทดสอบ</td></tr>
+      <tr><td>การประเมิน</td><td class="hl">ประเมินกระบวนการ ชิ้นงาน การนำเสนอ</td><td>ตามเกณฑ์ปกติของรายวิชา</td></tr>
+     </tbody></table></div></section>
+    <section><h2>2. เลือกหน่วยที่เหมาะสมอย่างไร</h2>
+     <ul><li>มี <b>ปัญหาจริง</b> ในชุมชน วิทยาลัย หรือสถานประกอบการให้แก้</li>
+     <li>ทำแล้วได้ <b>ชิ้นงานหรือผลลัพธ์ที่วัดได้</b> เช่น อุปกรณ์ ระบบ สูตร บริการ</li>
+     <li>ตรงกับ <b>สมรรถนะรายวิชา</b> ที่ต้องฝึก</li>
+     <li>มี <b>เวลาเรียน วัสดุ และงบประมาณ</b> เพียงพอ และปลอดภัย</li></ul></section>
+    <section><h2>3. สองเส้นทางในระบบนี้</h2>
+     <ol><li><b>การทำโครงงาน 6 ขั้น</b> ตั้งแต่เตรียมความพร้อมจนถึงประเมินโครงงาน แต่ละขั้นมีขั้นย่อยและ Prompt ให้ใช้</li>
+     <li><b>การเขียนเล่มรายงาน 11 ขั้น</b> เขียนรายงาน 5 บทพร้อมบรรณานุกรมและเตรียมการนำเสนอ โดยมีจุดที่ครูต้องตรวจ</li></ol></section>
+    <section><h2>4. ใช้ Prompt AI อย่างไรให้ถูกต้อง</h2>
+     <ol><li>เลือกขั้นที่กลุ่มกำลังทำอยู่</li>
+     <li>คัดลอก Prompt แล้วแทนข้อความใน <span class="ph">[วงเล็บเหลี่ยม]</span> ด้วยข้อมูลจริงของโครงงาน ระบบเติมข้อมูลกลุ่มให้บางส่วนแล้ว <span class="ph filled">สีเขียว</span></li>
+     <li>ตรวจผลลัพธ์จาก AI โดยเฉพาะ <b>ตัวเลข แหล่งอ้างอิง และข้อสรุป</b> อย่าใช้ข้อมูลที่ตรวจสอบไม่ได้</li>
+     <li>บันทึกผลงานลงในระบบ และ <b>ส่งครูตรวจ</b> ในขั้นที่มีตรา <span class="stamp">ครูตรวจ</span></li></ol></section>
+   </article>
+   <aside class="card shadow quiz stack" style="position:sticky;top:90px">
+    <h3>ทดสอบความเข้าใจ</h3><p class="small muted">ตอบถูกครบ 3 ข้อจึงไปขั้นถัดไปได้</p>
+    ${QUIZ.map((q,i)=>`<div class="q"><b class="small">${i+1}. ${e(q.q)}</b>${q.a.map((a,j)=>`<label><input type="radio" name="qz${i}" data-a="quiz" data-q="${i}" data-v="${j}" ${S.quiz[i]===j?'checked':''}><span>${e(a)}</span></label>`).join('')}
+     ${S.quiz[i]!=null&&S.ob==='quiz'?(S.quiz[i]===q.c?'<span class="small" style="color:var(--ok)">ถูกต้อง</span>':'<span class="small" style="color:var(--danger)">ยังไม่ถูก ลองอ่านหัวข้อที่เกี่ยวข้องอีกครั้ง</span>'):''}</div>`).join('')}
+    <button class="btn primary" data-a="checkQuiz" ${answered?'':'disabled'}>${S.ob==='quiz'&&correct?'ไปเลือกประเภทโครงงาน':'ตรวจคำตอบ'}</button>
+   </aside></div>`;
+}
+function unitsFromGroup(g){return (g&&g.units&&g.units.length)?g.units:[{no:'1',name:'',pbl:false},{no:'2',name:'',pbl:false},{no:'3',name:'',pbl:false}]}
+function viewSetup(first){
+  const g=S.data.bundle?S.data.bundle.group:{};
+  if(!S.units) S.units=JSON.parse(JSON.stringify(unitsFromGroup(g)));
+  return `<section class="stack" style="gap:22px">
+   ${first?`<div class="stack"><div class="eyebrow">ขั้นที่ 2 ของการตั้งกลุ่ม</div><h1>เลือกประเภทโครงงานและรูปแบบการจัด</h1></div>`:'<h2>ข้อมูลโครงงาน</h2>'}
+   <div class="card stack"><h3>ประเภทโครงงาน</h3>
+    <div class="types">${PROJECT_TYPES.map((t,i)=>`<label class="type"><input type="radio" name="ptype" value="${e(t.id)}" ${g.project_type===t.id?'checked':''}><span><b>${e(t.id)}</b><span class="small muted">${e(t.d)}</span></span></label>`).join('')}</div>
+    <div class="field"><label for="pName">ชื่อโครงงาน (ใส่ชื่อชั่วคราวได้ แก้ไขภายหลังได้)</label><input class="input" id="pName" value="${e(g.project_name||'')}" placeholder="เช่น เครื่องรดน้ำผักอัตโนมัติด้วยเซนเซอร์ความชื้นในดิน"></div>
+   </div>
+   <div class="card stack"><div class="row"><h3 class="grow">รูปแบบการจัด</h3><span class="tag pbl">รูปแบบที่ 3</span></div>
+    <p class="small muted">จัดเฉพาะบางหน่วยการเรียนรู้: ใส่หน่วยของรายวิชา แล้วเลือกหน่วยที่จัดแบบโครงงาน หน่วยที่ไม่เลือกจะสอนตามปกติ</p>
+    <div class="grid2"><div class="field"><label for="sCode">รหัสวิชา</label><input class="input mono" id="sCode" value="${e(g.subject_code||'')}" placeholder="เช่น 20104-2005"></div>
+    <div class="field"><label for="sName">ชื่อวิชา</label><input class="input" id="sName" value="${e(g.subject_name||'')}" placeholder="เช่น เครื่องมือวัดไฟฟ้า"></div></div>
+    <div class="units" id="units">${S.units.map((u,i)=>`<div class="unit">
+      <input class="input" id="uNo${i}" value="${e(u.no)}" aria-label="หน่วยที่" placeholder="หน่วย">
+      <input class="input" id="uName${i}" value="${e(u.name)}" aria-label="ชื่อหน่วย" placeholder="ชื่อหน่วยการเรียนรู้">
+      <label class="toggle"><input type="checkbox" id="uPbl${i}" ${u.pbl?'checked':''}>จัดแบบโครงงาน</label>
+      <button class="btn ghost sm" data-a="delUnit" data-i="${i}" aria-label="ลบหน่วย">ลบ</button></div>`).join('')}</div>
+    <div><button class="btn sm" data-a="addUnit">+ เพิ่มหน่วย</button></div>
+   </div>
+   <div class="row"><button class="btn primary" data-a="saveSetup">${first?'บันทึกและไปขั้นเลือกสมาชิก':'บันทึกข้อมูลโครงงาน'}</button></div>
+  </section>`;
+}
+function collectUnits(){return S.units.map((u,i)=>({no:val('uNo'+i),name:val('uName'+i),pbl:$('uPbl'+i)?$('uPbl'+i).checked:false}))}
+function viewTeam(first){
+  const b=S.data.bundle, members=b?b.members:[], max=S.data.maxMembers;
+  const g=b.group, lk=S.lookup;
+  const filter=S.tFilter.toLowerCase();
+  const teachers=S.data.teachers.filter(t=>!filter||(t.name+t.teacher_id+(t.department||'')).toLowerCase().includes(filter));
+  return `<section class="stack" style="gap:22px">
+   ${first?`<div class="stack"><div class="eyebrow">ขั้นสุดท้ายของการตั้งกลุ่ม · รหัสกลุ่ม <span class="mono">${e(g.group_id)}</span></div><h1>เพิ่มสมาชิกและเลือกครูผู้สอน</h1></div>`:''}
+   <div class="grid2" style="align-items:start">
+   <div class="card stack"><div class="row"><h3 class="grow">สมาชิกในกลุ่ม</h3><span class="small muted">${members.length}/${max} คน</span></div>
+    <div>${members.map(m=>`<div class="member"><div class="avatar">${e((m.name||'?').replace(/^(นาย|นางสาว|นาง|น\.ส\.)\s*/,'').charAt(0))}</div>
+      <div class="grow"><b>${e(m.name)}</b><div class="small muted"><span class="mono">${e(m.student_id)}</span> · ${e(m.phone)}</div></div>
+      ${m.student_id!==S.data.me.student_id?`<button class="btn danger sm" data-a="removeMember" data-v="${e(m.student_id)}">นำออก</button>`:'<span class="small muted">คุณ</span>'}</div>`).join('')}</div>
+    ${members.length<max?`<div class="stack" style="gap:8px"><div class="field"><label for="mId">เพิ่มสมาชิกด้วยรหัสนักศึกษา</label>
+      <div class="row"><input class="input mono grow" id="mId" style="flex:1 1 140px" value="${e(lk?lk.id:'')}" placeholder="รหัสนักศึกษา"><button class="btn" data-a="lookup">ค้นหา</button></div></div>
+      ${lk?(lk.exists?(lk.group_id&&lk.group_id!==g.group_id?`<div class="note danger">${e(lk.name)} อยู่ในกลุ่มอื่นแล้ว (${e(lk.group_id)})</div>`:
+        `<div class="note ok row"><span class="grow">พบข้อมูลลงทะเบียน: <b>${e(lk.name)}</b> · ${e(lk.phone)}</span><button class="btn primary sm" data-a="addMember">เพิ่มเข้ากลุ่ม</button></div>`):
+        `<div class="note info stack" style="gap:8px"><span>ยังไม่มีรหัสนี้ในระบบ กรอกข้อมูลเพื่อลงทะเบียนให้เพื่อน</span>
+         <div class="field"><label for="mName">ชื่อ-สกุล</label><input class="input" id="mName"></div>
+         <div class="field"><label for="mPhone">เบอร์โทร</label><input class="input" id="mPhone" inputmode="tel"></div>
+         <div><button class="btn primary sm" data-a="addMember">บันทึกและเพิ่มเข้ากลุ่ม</button></div></div>`):''}</div>`:'<p class="small muted">สมาชิกครบตามจำนวนสูงสุดแล้ว</p>'}
+   </div>
+   <div class="card stack"><h3>ครูผู้สอน</h3>
+    ${b.teacher?`<div class="note ok">ครูผู้สอนของกลุ่ม: <b>${e(b.teacher.name)}</b> <span class="small">(${e(b.teacher.department||'')})</span></div>`:'<div class="note">ยังไม่ได้เลือกครูผู้สอน ครูจะเห็นความก้าวหน้าของกลุ่มเมื่อกลุ่มเลือกแล้วเท่านั้น</div>'}
+    <input class="input" id="tFilter" placeholder="ค้นหาชื่อครูหรือแผนก" value="${e(S.tFilter)}" data-a="tfilter">
+    <div class="pick-list">${teachers.length?teachers.map(t=>`<div class="pick ${g.teacher_id===t.teacher_id?'on':''}" data-a="pickTeacher" data-v="${e(t.teacher_id)}" role="button" tabindex="0"><div class="avatar">ค</div><div class="grow"><b>${e(t.name)}</b><div class="small muted">${e(t.department||'')} · <span class="mono">${e(t.teacher_id)}</span></div></div>${g.teacher_id===t.teacher_id?'<span class="chip rv-approved">เลือกแล้ว</span>':''}</div>`).join(''):'<div class="pick muted small">ไม่พบครูที่ค้นหา</div>'}</div>
+    ${S.showAddTeacher?`<div class="stack" style="gap:8px;border-top:1px dashed var(--line);padding-top:12px"><b class="small">เพิ่มข้อมูลครูผู้สอน</b>
+      <div class="grid2"><div class="field"><label for="ntId">รหัสครู</label><input class="input mono" id="ntId"></div><div class="field"><label for="ntName">ชื่อ-สกุล</label><input class="input" id="ntName"></div>
+      <div class="field"><label for="ntPhone">เบอร์โทร</label><input class="input" id="ntPhone" inputmode="tel"></div><div class="field"><label for="ntDept">แผนก/สาขา</label><input class="input" id="ntDept"></div></div>
+      <div class="row"><button class="btn primary sm" data-a="addTeacher">บันทึกและเลือกครูท่านนี้</button><button class="btn ghost sm" data-a="toggleAddTeacher">ยกเลิก</button></div></div>`:
+      `<div><button class="btn ghost sm" data-a="toggleAddTeacher">ไม่พบครู? เพิ่มข้อมูลครู</button></div>`}
+   </div></div>
+   ${first?`<div class="row"><button class="btn primary" data-a="enterRoom" ${g.teacher_id?'':'disabled'}>เข้าสู่ห้องโครงงาน</button>${g.teacher_id?'':'<span class="small muted">เลือกครูผู้สอนก่อน</span>'}</div>`:''}
+  </section>`;
+}
+
+/* ======================== student home ======================== */
+function pmap(progress){const m={};(progress||[]).forEach(r=>m[r.track+'-'+r.step+'-'+r.sub]=r);return m}
+function gateOf(step,map){
+  const s=P_STEPS[step-1]; if(!s.gate) return '';
+  const r=map['P-'+s.gate.step+'-'+s.gate.sub];
+  if(r&&r.review_status==='approved') return '';
+  return 'ต้องให้ครูอนุมัติขั้น '+s.gate.step+'.'+s.gate.sub+' ก่อน';
+}
+function pickDefaultStep(){
+  const m=pmap(S.data.bundle.progress);
+  for(const s of P_STEPS){ if(gateOf(s.no,m)) {S.step=Math.max(1,s.no-1);return} const all=s.subs.every((_,i)=>{const r=m['P-'+s.no+'-'+(i+1)];return r&&(r.status==='done'||r.status==='submitted')}); if(!all){S.step=s.no;return} }
+  S.step=6;
+}
+function fillVars(){
+  const b=S.data?.bundle||S.tGroup; if(!b) return {};
+  const g=b.group, me=(S.role==='student'&&S.data?S.data.me:b.members[0])||{};
+  const pbl=(g.units||[]).filter(u=>u.pbl).map(u=>'หน่วยที่ '+u.no+' '+u.name).join(', ');
+  return {'ชื่อโครงงาน':g.project_name,'ประเภทโครงงาน':g.project_type?('โครงงาน'+g.project_type):'','รายวิชา':[g.subject_code,g.subject_name].filter(Boolean).join(' '),
+    'หน่วยการเรียนรู้':pbl,'ระดับชั้น':me.level,'สาขาวิชา':me.department,'จำนวนสมาชิก':String(b.members.length),'รายชื่อสมาชิก':b.members.map(m=>m.name).join(', ')};
+}
+function promptHTML(text){
+  const v=fillVars();
+  return e(text).replace(/\[([^\]]+)\]/g,(m,k)=>{const x=v[k]; return x?`<span class="ph filled">${e(x)}</span>`:`<span class="ph">[${k}]</span>`});
+}
+function promptText(text){const v=fillVars();return text.replace(/\[([^\]]+)\]/g,(m,k)=>v[k]||m)}
+function statusChips(r,cp){
+  let h='';
+  const st=r?r.status:'todo';
+  if(r&&r.review_status) h+=`<span class="chip rv-${r.review_status}">${REVIEW[r.review_status]}</span>`;
+  else h+=`<span class="chip st-${st}">${STATUS[st]}</span>`;
+  if(cp) h+=`<span class="stamp">ครูตรวจ</span>`;
+  return h;
+}
+function viewStudent(){
+  const b=S.data.bundle, g=b.group, sum=b.summary;
+  const pblUnits=(g.units||[]).filter(u=>u.pbl);
+  const tabs=[['P','ทำโครงงาน 6 ขั้น'],['R','เขียนเล่มรายงาน 11 ขั้น'],['G','ข้อมูลกลุ่ม']];
+  const revise=b.progress.filter(r=>r.review_status==='revise').length;
+  return `<div class="band"><div class="wrap">
+    <div class="stack" style="gap:8px;min-width:0">
+      <div class="eyebrow">กลุ่ม <span class="mono">${e(g.group_id)}</span> · โครงงาน${e(g.project_type)}</div>
+      <h1>${e(g.project_name||'ยังไม่ได้ตั้งชื่อโครงงาน')}</h1>
+      <div class="meta"><span>รายวิชา <b>${e([g.subject_code,g.subject_name].filter(Boolean).join(' ')||'—')}</b></span><span>ครูผู้สอน <b>${e(b.teacher?b.teacher.name:'—')}</b></span><span>สมาชิก <b>${b.members.map(m=>e(m.name)).join(', ')}</b></span></div>
+      <div class="row" style="gap:6px">${pblUnits.map(u=>`<span class="tag pbl">หน่วยที่ ${e(u.no)} ${e(u.name)}</span>`).join('')}<span class="small muted">${(g.units||[]).length-pblUnits.length>0?'หน่วยอื่นอีก '+((g.units||[]).length-pblUnits.length)+' หน่วยเรียนตามปกติ':''}</span></div>
+    </div>
+    <div class="meters">
+      <div><div class="lbl"><span>ทำโครงงาน 6 ขั้น</span><span class="pct">${sum.pPct}%</span></div><div class="meter"><i style="width:${sum.pPct}%"></i></div><div class="small muted">${sum.P}/${sum.pTotal} ขั้นย่อย</div></div>
+      <div><div class="lbl"><span>เขียนเล่มรายงาน 11 ขั้น</span><span class="pct">${sum.rPct}%</span></div><div class="meter amber"><i style="width:${sum.rPct}%"></i></div><div class="small muted">${sum.R}/${sum.rTotal} ขั้น</div></div>
+      ${revise?`<div class="note danger small">ครูส่งกลับให้แก้ไข ${revise} รายการ</div>`:''}
+    </div>
+  </div><div class="wrap"><nav class="tabs">${tabs.map(([k,l])=>`<button class="${S.tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</nav></div></div>
+  <main class="wrap">${S.tab==='P'?viewTrackP(b,false):S.tab==='R'?viewTrackR(b,false):viewGroupInfo()}</main>`;
+}
+function viewGroupInfo(){
+  return `<div class="section">${viewSetup(false)}<h2>สมาชิกและครูผู้สอน</h2>${viewTeam(false)}</div>`;
+}
+function railP(b,teacher){
+  const m=pmap(b.progress), cur=teacher?S.tStep:S.step;
+  return `<nav class="rail">${P_STEPS.map(s=>{
+    const done=s.subs.filter((_,i)=>{const r=m['P-'+s.no+'-'+(i+1)];return r&&(r.status==='done'||r.status==='submitted')}).length;
+    const pend=s.subs.filter((_,i)=>{const r=m['P-'+s.no+'-'+(i+1)];return r&&r.review_status==='pending'}).length;
+    const lock=gateOf(s.no,m);
+    return `<button class="${cur===s.no?'on':''}" data-a="${teacher?'tstep':'step'}" data-v="${s.no}"><span class="n">${s.no}</span><span class="t">${e(s.title)}</span>
+      <span class="s">${done}/${s.subs.length} เสร็จ ${pend?`<span class="chip rv-pending">รอตรวจ ${pend}</span>`:''} ${lock?'<span class="lock">· ล็อก</span>':''}</span></button>`}).join('')}</nav>`;
+}
+function viewTrackP(b,teacher){
+  const m=pmap(b.progress), cur=teacher?S.tStep:S.step, s=P_STEPS[cur-1];
+  const lock=gateOf(s.no,m);
+  let body='';
+  if(lock&&!teacher) body=`<div class="card locked"><span class="stamp">ล็อก</span><h3>${e(lock)}</h3><p class="muted">ส่งขั้น ${s.gate.step}.${s.gate.sub} ให้ครูตรวจ เมื่อครูอนุมัติแล้วขั้นนี้จะเปิดให้ทำ ระหว่างนี้ดูรายละเอียดขั้นย่อยได้ด้านล่าง</p>
+    <ol class="small muted">${s.subs.map(x=>`<li>${e(x.t)}</li>`).join('')}</ol><button class="btn" data-a="step" data-v="${s.gate.step}">ไปขั้นที่ ${s.gate.step}</button></div>`;
+  else body=`<div class="tasks">${s.subs.map((x,i)=>taskCard('P',s.no,i+1,s.no+'.'+(i+1),x.t,x.d,x.p,x.cp,m,teacher)).join('')}</div>`;
+  return `<div class="work">${railP(b,teacher)}<section style="min-width:0">
+    <div class="step-head"><div class="step-no">${String(s.no).padStart(2,'0')}</div><div class="stack" style="gap:4px"><div class="eyebrow">การทำโครงงาน ขั้นที่ ${s.no} จาก 6</div><h2>${e(s.title)}</h2><span class="small muted">อ้างอิงคู่มือ Prompt AI วิชาโครงงาน หน้า ${s.pages} · ${s.subs.length} ขั้นย่อย</span></div></div>
+    ${body}</section></div>`;
+}
+function viewTrackR(b,teacher){
+  const m=pmap(b.progress);
+  return `<div class="section"><div class="step-head"><div class="step-no" style="color:var(--amber)">11</div><div class="stack" style="gap:4px"><div class="eyebrow">ภาค 2 ของคู่มือ หน้า 43–61</div><h2>การเขียนเล่มรายงานโครงงาน</h2><span class="small muted">เขียนรายงานให้ครบ 5 บท พร้อมบรรณานุกรมและเตรียมการนำเสนอ ขั้นที่มีตรา “ครูตรวจ” ต้องส่งให้ครูตรวจ</span></div></div>
+   <div class="tasks">${R_STEPS.map(r=>taskCard('R',r.no,0,String(r.no),r.t,r.task,r.p,r.cp,m,teacher,r.teacher)).join('')}</div></div>`;
+}
+function taskCard(track,step,sub,label,title,desc,prompt,cp,m,teacher,teacherTask){
+  const key=track+'-'+step+'-'+sub, r=m[key], open=(teacher?S.tOpen:S.open)===key;
+  const d=S.drafts[key]||{};
+  let body='';
+  if(open){
+    if(teacher){
+      body=`<div class="task-b">
+        ${teacherTask?`<dl class="kv"><dt>งานของผู้เรียน</dt><dd>${e(desc)}</dd><dt>งานตรวจของครู</dt><dd><b>${e(teacherTask)}</b></dd></dl>`:`<p class="muted">${e(desc)}</p>`}
+        ${r&&r.work?`<div class="stack" style="gap:6px"><b class="small">ผลงานที่กลุ่มบันทึก</b><div class="worktext">${e(r.work)}</div></div>`:'<p class="small muted">กลุ่มยังไม่ได้บันทึกผลงานในขั้นนี้</p>'}
+        ${r&&r.link?`<p class="small">ลิงก์ผลงาน: <a href="${e(safeUrl(r.link))}" target="_blank" rel="noopener">${e(r.link)}</a></p>`:''}
+        ${r?`<p class="small muted">บันทึกล่าสุด ${e(r.updated_at)} โดย <span class="mono">${e(r.updated_by)}</span></p>`:''}
+        <div class="review-form">
+          <b>ผลการตรวจ</b>
+          <div class="status-pick">
+            <label><input type="radio" name="rv-${key}" value="approved" ${r&&r.review_status==='approved'?'checked':''}><span>ผ่าน / อนุมัติ</span></label>
+            <label><input type="radio" name="rv-${key}" value="revise" ${r&&r.review_status==='revise'?'checked':''}><span>ส่งกลับแก้ไข</span></label></div>
+          <div class="field"><label for="rc-${key}">ความเห็นและข้อเสนอแนะ</label><textarea class="input" id="rc-${key}" style="min-height:90px">${e(r?r.review_comment:'')}</textarea></div>
+          <div class="row"><div class="field" style="width:140px"><label for="rs-${key}">คะแนน (ถ้ามี)</label><input class="input" id="rs-${key}" inputmode="decimal" value="${e(r?r.score:'')}"></div><span class="spacer"></span>
+          <button class="btn primary" data-a="review" data-k="${key}">บันทึกผลการตรวจ</button></div>
+        </div></div>`;
+    } else {
+      const work=d.work!=null?d.work:(r?r.work:''), link=d.link!=null?d.link:(r?r.link:'');
+      const st=d.status||(r?r.status:'todo');
+      body=`<div class="task-b">
+        ${teacherTask!=null&&track==='R'?`<dl class="kv"><dt>งานของผู้เรียน</dt><dd>${e(desc)}</dd>${teacherTask?`<dt>งานตรวจของครู</dt><dd>${e(teacherTask)}</dd>`:''}</dl>`:`<p class="muted">${e(desc)}</p>`}
+        ${r&&r.review_status&&r.review_status!=='pending'&&(r.review_comment||r.score)?`<div class="feedback ${r.review_status}"><b class="small">${REVIEW[r.review_status]} · ${e(r.reviewed_at)}</b>${r.review_comment?`<div>${e(r.review_comment)}</div>`:''}${r.score?`<div class="small">คะแนน: <b>${e(r.score)}</b></div>`:''}</div>`:''}
+        <div class="prompt"><div class="prompt-h"><span class="grow">Prompt สำหรับขั้นนี้ · แทน <span class="ph">[ข้อความสีเหลือง]</span> ด้วยข้อมูลจริง</span><button class="btn sm" data-a="copy" data-k="${key}">คัดลอก</button></div><pre id="pr-${key}">${promptHTML(prompt)}</pre></div>
+        <div class="field"><label for="w-${key}">บันทึกผลงาน / สิ่งที่ได้จาก AI ที่ตรวจสอบแล้ว</label><textarea class="input" id="w-${key}" data-draft="${key}" placeholder="สรุปสิ่งที่กลุ่มทำ ผลที่ได้ และสิ่งที่แก้ไขจากคำตอบของ AI">${e(work)}</textarea></div>
+        <div class="field"><label for="l-${key}">ลิงก์ไฟล์ผลงาน (Google Drive ฯลฯ)</label><input class="input" id="l-${key}" data-draftlink="${key}" value="${e(link)}" placeholder="https://"></div>
+        <div class="row"><div class="status-pick" role="radiogroup" aria-label="สถานะ">
+          ${['todo','doing','done'].concat(cp?['submitted']:[]).map(k=>`<label><input type="radio" name="s-${key}" value="${k}" ${st===k?'checked':''}><span>${STATUS[k]}</span></label>`).join('')}</div>
+          <span class="spacer"></span><button class="btn primary" data-a="saveTask" data-k="${key}">บันทึก</button></div>
+        ${cp?'<p class="small muted">ขั้นนี้ต้องส่งครูตรวจ เลือกสถานะ “ส่งครูตรวจ” เมื่อพร้อม</p>':''}
+      </div>`;
+    }
+  }
+  return `<article class="task ${open?'open':''}" id="task-${key}">
+    <button class="task-h" data-a="${teacher?'topen':'open'}" data-k="${key}" aria-expanded="${open}"><span class="k">${label}</span><span class="tt">${e(title)}</span><span class="chips">${statusChips(r,cp)}</span></button>${body}</article>`;
+}
+function safeUrl(u){return /^https?:\/\//i.test(u)?u:'#'}
+
+/* ======================== teacher ======================== */
+function viewTeacher(){
+  if(S.tGroup) return viewTeacherGroup();
+  const d=S.data, gs=d.groups;
+  const pending=gs.reduce((a,b)=>a+b.summary.pending,0);
+  return `<main class="wrap section">
+   <div class="stack" style="gap:6px"><div class="eyebrow">ครูผู้สอน · ${e(d.me.department||'')}</div><h1>กลุ่มโครงงานที่เลือกท่าน</h1>
+   <p class="muted">แสดงเฉพาะกลุ่มที่นักศึกษาเลือก ${e(d.me.name)} เป็นครูผู้สอน</p></div>
+   <div class="stats"><div class="stat"><div class="small muted">จำนวนกลุ่ม</div><div class="v">${gs.length}</div></div>
+   <div class="stat"><div class="small muted">รอตรวจ</div><div class="v" style="color:var(--amber)">${pending}</div></div>
+   <div class="stat"><div class="small muted">นักศึกษาทั้งหมด</div><div class="v">${gs.reduce((a,b)=>a+b.members.length,0)}</div></div></div>
+   ${gs.length?`<div class="glist">${gs.sort((a,b)=>b.summary.pending-a.summary.pending).map(b=>`<button class="gitem" data-a="tgroup" data-v="${e(b.group.group_id)}">
+     <div style="min-width:0"><b>${e(b.group.project_name||'(ยังไม่ตั้งชื่อ)')}</b><div class="small muted"><span class="mono">${e(b.group.group_id)}</span> · ${e(b.group.subject_name||'')} · ${b.members.length} คน</div></div>
+     <div class="mini-meter"><span>6 ขั้น</span><div class="meter"><i style="width:${b.summary.pPct}%"></i></div><span class="pct">${b.summary.pPct}%</span></div>
+     <div class="mini-meter"><span>เล่ม</span><div class="meter amber"><i style="width:${b.summary.rPct}%"></i></div><span class="pct">${b.summary.rPct}%</span></div>
+     <div>${b.summary.pending?`<span class="chip rv-pending">รอตรวจ ${b.summary.pending}</span>`:`<span class="small muted">${e(b.summary.last?'อัปเดต '+b.summary.last.slice(0,10):'ยังไม่เริ่ม')}</span>`}</div></button>`).join('')}</div>`:
+   `<div class="card stack"><h3>ยังไม่มีกลุ่มที่เลือกท่าน</h3><p class="muted">แจ้งรหัสครู <b class="mono">${e(d.me.teacher_id)}</b> ให้นักศึกษาใช้เลือกครูผู้สอนในขั้นตั้งกลุ่ม</p></div>`}
+  </main>`;
+}
+function viewTeacherGroup(){
+  const b=S.tGroup, g=b.group;
+  const tabs=[['P','ทำโครงงาน 6 ขั้น'],['R','เขียนเล่มรายงาน 11 ขั้น'],['M','สมาชิก']];
+  const pendP=b.progress.filter(r=>r.track==='P'&&r.review_status==='pending').length, pendR=b.progress.filter(r=>r.track==='R'&&r.review_status==='pending').length;
+  return `<div class="band"><div class="wrap"><div class="stack" style="gap:8px;min-width:0">
+    <div><button class="btn ghost sm" data-a="tback">← กลับรายการกลุ่ม</button></div>
+    <div class="eyebrow">กลุ่ม <span class="mono">${e(g.group_id)}</span> · โครงงาน${e(g.project_type)}</div><h1>${e(g.project_name||'(ยังไม่ตั้งชื่อ)')}</h1>
+    <div class="meta"><span>รายวิชา <b>${e([g.subject_code,g.subject_name].filter(Boolean).join(' '))}</b></span><span>หน่วยที่จัดแบบโครงงาน <b>${e((g.units||[]).filter(u=>u.pbl).map(u=>u.no+' '+u.name).join(', ')||'—')}</b></span></div></div>
+    <div class="meters"><div><div class="lbl"><span>ทำโครงงาน 6 ขั้น</span><span class="pct">${b.summary.pPct}%</span></div><div class="meter"><i style="width:${b.summary.pPct}%"></i></div></div>
+    <div><div class="lbl"><span>เขียนเล่มรายงาน</span><span class="pct">${b.summary.rPct}%</span></div><div class="meter amber"><i style="width:${b.summary.rPct}%"></i></div></div></div>
+  </div><div class="wrap"><nav class="tabs">${tabs.map(([k,l])=>`<button class="${S.tTab===k?'on':''}" data-a="ttab" data-v="${k}">${l}${k==='P'&&pendP?`<span class="count">${pendP}</span>`:''}${k==='R'&&pendR?`<span class="count">${pendR}</span>`:''}</button>`).join('')}</nav></div></div>
+  <main class="wrap">${S.tTab==='P'?viewTrackP(b,true):S.tTab==='R'?viewTrackR(b,true):
+   `<div class="section"><div class="card"><div class="tablebox"><table class="tbl"><thead><tr><th>รหัสนักศึกษา</th><th>ชื่อ-สกุล</th><th>ระดับชั้น</th><th>สาขา</th><th>เบอร์โทร</th></tr></thead><tbody>${b.members.map(m=>`<tr><td class="mono">${e(m.student_id)}</td><td>${e(m.name)}</td><td>${e(m.level)}</td><td>${e(m.department)}</td><td class="mono">${e(m.phone)}</td></tr>`).join('')}</tbody></table></div></div></div>`}</main>`;
+}
+
+/* ======================== admin ======================== */
+function viewAdmin(){
+  const d=S.data, t=S.adminTab;
+  const tabs=[['overview','ภาพรวม'],['groups','กลุ่มโครงงาน'],['students','นักศึกษา'],['teachers','ครูผู้สอน'],['import','นำเข้าข้อมูล'],['settings','ตั้งค่า'],['logs','บันทึกการใช้งาน']];
+  let body='';
+  if(S.tGroup&&t==='groups') return viewTeacherGroup();
+  if(t==='overview'){
+    const gs=d.groups, avgP=gs.length?Math.round(gs.reduce((a,b)=>a+b.summary.pPct,0)/gs.length):0, avgR=gs.length?Math.round(gs.reduce((a,b)=>a+b.summary.rPct,0)/gs.length):0;
+    body=`${S.defaultPw?'<div class="note danger">ยังใช้รหัสผู้ดูแลเริ่มต้นอยู่ กรุณาเปลี่ยนในแท็บ “ตั้งค่า”</div>':''}
+    <div class="stats"><div class="stat"><div class="small muted">นักศึกษา</div><div class="v">${d.students.length}</div></div><div class="stat"><div class="small muted">ครูผู้สอน</div><div class="v">${d.teachers.length}</div></div>
+    <div class="stat"><div class="small muted">กลุ่มโครงงาน</div><div class="v">${gs.length}</div></div><div class="stat"><div class="small muted">เฉลี่ย 6 ขั้น</div><div class="v">${avgP}%</div></div><div class="stat"><div class="small muted">เฉลี่ยเล่มรายงาน</div><div class="v">${avgR}%</div></div>
+    <div class="stat"><div class="small muted">ยังไม่มีกลุ่ม</div><div class="v">${d.students.filter(s=>!s.group_id).length}</div></div></div>
+    <div class="card stack"><h3>ความก้าวหน้าแยกตามครูผู้สอน</h3><div class="tablebox"><table class="tbl"><thead><tr><th>ครูผู้สอน</th><th>กลุ่ม</th><th>รอตรวจ</th><th>เฉลี่ย 6 ขั้น</th><th>เฉลี่ยเล่ม</th></tr></thead><tbody>
+    ${d.teachers.map(tc=>{const mine=gs.filter(b=>b.group.teacher_id===tc.teacher_id);const ap=mine.length?Math.round(mine.reduce((a,b)=>a+b.summary.pPct,0)/mine.length):0;const ar=mine.length?Math.round(mine.reduce((a,b)=>a+b.summary.rPct,0)/mine.length):0;
+      return `<tr><td>${e(tc.name)}</td><td class="num">${mine.length}</td><td class="num">${mine.reduce((a,b)=>a+b.summary.pending,0)}</td><td class="num">${ap}%</td><td class="num">${ar}%</td></tr>`}).join('')}</tbody></table></div></div>`;
+  } else if(t==='groups'){
+    body=`<div class="card"><div class="tablebox"><table class="tbl"><thead><tr><th>รหัสกลุ่ม</th><th>ชื่อโครงงาน</th><th>รายวิชา</th><th>สมาชิก</th><th>ครูผู้สอน</th><th>6 ขั้น</th><th>เล่ม</th><th></th></tr></thead><tbody>
+    ${d.groups.map(b=>{const g=b.group;return `<tr><td class="mono">${e(g.group_id)}</td><td style="min-width:200px"><input class="input" id="gn-${e(g.group_id)}" value="${e(g.project_name)}"></td><td>${e(g.subject_name)}</td>
+     <td>${b.members.map(m=>e(m.name)).join('<br>')}</td>
+     <td><select class="input" id="gt-${e(g.group_id)}"><option value="">— ไม่ระบุ —</option>${d.teachers.map(tc=>`<option value="${e(tc.teacher_id)}" ${tc.teacher_id===g.teacher_id?'selected':''}>${e(tc.name)}</option>`).join('')}</select></td>
+     <td class="num">${b.summary.pPct}%</td><td class="num">${b.summary.rPct}%</td>
+     <td><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-a="agView" data-v="${e(g.group_id)}">ดูงาน</button><button class="btn sm" data-a="agSave" data-v="${e(g.group_id)}">บันทึก</button><button class="btn danger sm" data-a="adel" data-t="groups" data-v="${e(g.group_id)}">ลบ</button></div></td></tr>`}).join('')||'<tr><td colspan="8" class="muted">ยังไม่มีกลุ่ม</td></tr>'}</tbody></table></div></div>`;
+  } else if(t==='students'||t==='teachers'){
+    const isS=t==='students', rows=(isS?d.students:d.teachers).filter(r=>!S.adminQ||JSON.stringify(r).toLowerCase().includes(S.adminQ.toLowerCase()));
+    const idk=isS?'student_id':'teacher_id';
+    body=`<div class="card stack"><h3>${isS?'เพิ่ม/แก้ไขนักศึกษา':'เพิ่ม/แก้ไขครูผู้สอน'}</h3><p class="small muted">กรอกรหัสที่มีอยู่แล้วเพื่อแก้ไขข้อมูล หรือรหัสใหม่เพื่อเพิ่ม</p>
+     <div class="grid2"><div class="field"><label for="ar-id">${isS?'รหัสนักศึกษา':'รหัสครู'}</label><input class="input mono" id="ar-id"></div><div class="field"><label for="ar-name">ชื่อ-สกุล</label><input class="input" id="ar-name"></div>
+     <div class="field"><label for="ar-phone">เบอร์โทร</label><input class="input" id="ar-phone"></div>${isS?`<div class="field"><label for="ar-level">ระดับชั้น</label><input class="input" id="ar-level"></div>`:''}<div class="field"><label for="ar-dept">${isS?'สาขาวิชา':'แผนก/สาขา'}</label><input class="input" id="ar-dept"></div></div>
+     <div><button class="btn primary" data-a="asave" data-t="${t}">บันทึก</button></div></div>
+     <div class="card stack"><div class="row"><h3 class="grow">${isS?'รายชื่อนักศึกษา':'รายชื่อครูผู้สอน'} (${rows.length})</h3><input class="input" id="adminQ" style="max-width:260px" placeholder="ค้นหา" value="${e(S.adminQ)}" data-a="aq"></div>
+     <div class="tablebox" style="max-height:520px"><table class="tbl"><thead><tr><th>รหัส</th><th>ชื่อ-สกุล</th><th>เบอร์โทร</th>${isS?'<th>ระดับชั้น</th><th>สาขา</th><th>กลุ่ม</th>':'<th>แผนก</th>'}<th></th></tr></thead><tbody>
+     ${rows.map(r=>`<tr><td class="mono">${e(r[idk])}</td><td>${e(r.name)}</td><td class="mono">${e(r.phone)}</td>${isS?`<td>${e(r.level)}</td><td>${e(r.department)}</td><td class="mono">${e(r.group_id||'—')}</td>`:`<td>${e(r.department)}</td>`}
+      <td><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-a="aedit" data-t="${t}" data-v="${e(r[idk])}">แก้ไข</button><button class="btn danger sm" data-a="adel" data-t="${t}" data-v="${e(r[idk])}">ลบ</button></div></td></tr>`).join('')}</tbody></table></div></div>`;
+  } else if(t==='import'){
+    body=`<div class="card stack"><h3>นำเข้ารายชื่อจาก Excel หรือ Google Sheet</h3>
+     <p class="muted">คัดลอกแถวข้อมูลจากตาราง (ไม่ต้องมีหัวตาราง) แล้ววางในช่องด้านล่าง ระบบรองรับทั้งแท็บและจุลภาค รหัสที่มีอยู่แล้วจะถูกอัปเดต</p>
+     <div class="field" style="max-width:320px"><label for="imT">ประเภทข้อมูล</label><select class="input" id="imT"><option value="students">นักศึกษา: รหัส, ชื่อ-สกุล, เบอร์โทร, ระดับชั้น, สาขาวิชา</option><option value="teachers">ครู: รหัส, ชื่อ-สกุล, เบอร์โทร, แผนก</option></select></div>
+     <textarea class="input mono" id="imData" style="min-height:200px" placeholder="66201010010	นายสมชาย ใจกล้า	0891112222	ปวช.3	ช่างไฟฟ้า"></textarea>
+     <div><button class="btn primary" data-a="aimport">นำเข้า</button></div><div id="imResult"></div></div>`;
+  } else if(t==='settings'){
+    body=`<div class="grid2" style="align-items:start"><div class="card stack"><h3>การจัดกลุ่ม</h3><div class="field"><label for="setMax">จำนวนสมาชิกสูงสุดต่อกลุ่ม</label><input class="input" id="setMax" type="number" min="1" max="20" value="${e(d.settings.max_members)}"></div><div><button class="btn primary" data-a="asetting">บันทึก</button></div></div>
+     <div class="card stack"><h3>เปลี่ยนรหัสผู้ดูแล</h3><div class="field"><label for="pwOld">รหัสเดิม</label><input class="input" type="password" id="pwOld" autocomplete="current-password"></div><div class="field"><label for="pwNew">รหัสใหม่ (อย่างน้อย 8 ตัวอักษร)</label><input class="input" type="password" id="pwNew" autocomplete="new-password"></div><div><button class="btn primary" data-a="apw">เปลี่ยนรหัส</button></div></div></div>`;
+  } else if(t==='logs'){
+    body=`<div class="card"><div class="tablebox" style="max-height:600px"><table class="tbl"><thead><tr><th>เวลา</th><th>บทบาท</th><th>ผู้ใช้</th><th>การทำงาน</th><th>รายละเอียด</th></tr></thead><tbody>${d.logs.map(l=>`<tr><td class="mono small">${e(l.time)}</td><td>${e(l.role)}</td><td class="mono">${e(l.user_id)}</td><td>${e(l.action)}</td><td class="small">${e(l.detail)}</td></tr>`).join('')}</tbody></table></div></div>`;
+  }
+  return `<div class="band"><div class="wrap" style="grid-template-columns:1fr"><div class="stack" style="gap:4px"><div class="eyebrow">ระบบหลังบ้าน</div><h1>จัดการข้อมูลวิชาโครงงาน</h1></div></div>
+   <div class="wrap"><nav class="tabs">${tabs.map(([k,l])=>`<button class="${t===k?'on':''}" data-a="atab" data-v="${k}">${l}</button>`).join('')}</nav></div></div>
+   <main class="wrap section">${body}</main>`;
+}
+function parseRows(text,table){
+  return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const c=(l.includes('\t')?l.split('\t'):l.split(',')).map(x=>x.trim());
+    return table==='students'?{student_id:c[0],name:c[1],phone:c[2],level:c[3],department:c[4]}:{teacher_id:c[0],name:c[1],phone:c[2],department:c[3]}});
+}
+
+/* ======================== events ======================== */
+const armed={};
+document.addEventListener('click',ev=>{
+  const el=ev.target.closest('[data-a]'); if(!el) return;
+  const a=el.dataset.a, v=el.dataset.v;
+  if(el.tagName==='INPUT'&&el.type!=='radio'&&el.type!=='checkbox') return;
+  const H=HANDLERS[a]; if(H){ if(el.tagName==='BUTTON'||el.classList.contains('pick')) ev.preventDefault(); H(el,v); }
+});
+document.addEventListener('keydown',ev=>{
+  if(ev.key==='Enter'){
+    if(ev.target.id==='loginId') HANDLERS.login();
+    else if(ev.target.id==='adminPw') HANDLERS.loginAdmin();
+    else if(ev.target.id==='mId') HANDLERS.lookup();
+    else if(ev.target.classList.contains('pick')) ev.target.click();
+  }
+});
+document.addEventListener('input',ev=>{
+  if(ev.target.id==='tFilter'){S.tFilter=ev.target.value;const pos=ev.target.selectionStart;render();const t=$('tFilter');t.focus();t.setSelectionRange(pos,pos)}
+  if(ev.target.id==='adminQ'){S.adminQ=ev.target.value;const pos=ev.target.selectionStart;render();const t=$('adminQ');t.focus();t.setSelectionRange(pos,pos)}
+});
+function keepUnits(){ if(S.units&&$('uNo0')) S.units=collectUnits(); }
+const HANDLERS={
+  ltab(el,v){S.loginTab=v;S.reg=null;render();setTimeout(()=>{const i=$('loginId')||$('adminPw');i&&i.focus()},0)},
+  fill(el,v){$('loginId').value=v},
+  cancelReg(){S.reg=null;render()},
+  login(){
+    const id=val('loginId'); if(!id){toast('กรุณากรอกรหัส',true);return}
+    const isT=S.loginTab==='teacher';
+    act(async()=>{
+      const r=await call(isT?'loginTeacher':'loginStudent',isT?{teacher_id:id}:{student_id:id});
+      if(r.needRegister){S.reg=id;render();setTimeout(()=>$('rgName')&&$('rgName').focus(),0);return}
+      await afterLogin(r);
+    });
+  },
+  register(){
+    const isT=S.loginTab==='teacher';
+    const p=isT?{teacher_id:S.reg,name:val('rgName'),phone:val('rgPhone'),department:val('rgDept')}:{student_id:S.reg,name:val('rgName'),phone:val('rgPhone'),level:val('rgLevel'),department:val('rgDept')};
+    act(async()=>{const r=await call(isT?'registerTeacher':'registerStudent',p);toast('ลงทะเบียนเรียบร้อย');await afterLogin(r)});
+  },
+  loginAdmin(){act(async()=>{const r=await call('loginAdmin',{password:$('adminPw').value});S.defaultPw=r.defaultPassword;await afterLogin(r)})},
+  logout(){const t=S.token;call('logout').catch(()=>{});store.set('pbl3_lesson','');S.units=null;S.ob='lesson';S.quiz={};logoutLocal()},
+  quiz(el){S.quiz[+el.dataset.q]=+el.dataset.v; if(S.ob==='quiz'){render()} else { const answered=QUIZ.every((_,i)=>S.quiz[i]!=null); const b=document.querySelector('[data-a="checkQuiz"]'); if(b) b.disabled=!answered; }},
+  checkQuiz(){
+    const ok=QUIZ.every((q,i)=>S.quiz[i]===q.c);
+    if(S.ob==='quiz'&&ok){store.set('pbl3_lesson','1');S.ob='setup';render();window.scrollTo(0,0);return}
+    S.ob='quiz';render(); toast(ok?'ตอบถูกทุกข้อ ไปขั้นถัดไปได้':'ยังมีข้อที่ไม่ถูก',!ok);
+  },
+  addUnit(){keepUnits();S.units.push({no:String(S.units.length+1),name:'',pbl:false});render()},
+  delUnit(el){keepUnits();S.units.splice(+el.dataset.i,1);if(!S.units.length)S.units.push({no:'1',name:'',pbl:false});render()},
+  saveSetup(){
+    keepUnits();
+    const type=(document.querySelector('input[name="ptype"]:checked')||{}).value;
+    if(!type){toast('กรุณาเลือกประเภทโครงงาน',true);return}
+    const units=S.units.filter(u=>u.name);
+    if(!units.some(u=>u.pbl)){toast('เลือกหน่วยที่จัดแบบโครงงานอย่างน้อย 1 หน่วย',true);return}
+    const p={project_type:type,project_name:val('pName'),subject_code:val('sCode'),subject_name:val('sName'),units,lesson_done:true};
+    act(async()=>{const d=await call('saveSetup',p);toast('บันทึกข้อมูลโครงงานแล้ว');S.units=null;if(S.view==='onboard'){S.ob='team';S.data=d;render();window.scrollTo(0,0)}else{S.data=d;render()}});
+  },
+  lookup(){const id=val('mId');if(!id)return;act(async()=>{const r=await call('lookupStudent',{student_id:id});S.lookup=Object.assign({id},r);render();setTimeout(()=>$('mName')&&$('mName').focus(),0)})},
+  addMember(){const lk=S.lookup;if(!lk)return;act(async()=>{S.data=await call('addMember',{student_id:lk.id,name:val('mName'),phone:val('mPhone')});S.lookup=null;toast('เพิ่มสมาชิกแล้ว');render()})},
+  removeMember(el,v){if(!arm(el))return;act(async()=>{S.data=await call('removeMember',{student_id:v});toast('นำสมาชิกออกแล้ว');render()})},
+  pickTeacher(el,v){act(async()=>{S.data=await call('saveSetup',{teacher_id:v});toast('เลือกครูผู้สอนแล้ว');render()})},
+  toggleAddTeacher(){S.showAddTeacher=!S.showAddTeacher;render()},
+  addTeacher(){act(async()=>{S.data=await call('addTeacher',{teacher_id:val('ntId'),name:val('ntName'),phone:val('ntPhone'),department:val('ntDept')});S.showAddTeacher=false;toast('เพิ่มครูและเลือกเป็นครูผู้สอนแล้ว');render()})},
+  enterRoom(){S.view='student';S.tab='P';pickDefaultStep();render();window.scrollTo(0,0)},
+  tab(el,v){keepUnits();S.tab=v;S.units=null;S.lookup=null;render()},
+  step(el,v){S.step=+v;S.open='';render();scrollToWork()},
+  open(el){const k=el.dataset.k;S.open=S.open===k?'':k;render();if(S.open)$('task-'+k).scrollIntoView({block:'nearest'})},
+  copy(el){
+    const [track,step,sub]=el.dataset.k.split('-');
+    const src=track==='P'?P_STEPS[step-1].subs[sub-1].p:R_STEPS[step-1].p;
+    const text=promptText(src);
+    const fallback=()=>{const r=document.createRange();r.selectNodeContents($('pr-'+el.dataset.k));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('เลือกข้อความแล้ว กด Ctrl+C / คัดลอก')};
+    try{navigator.clipboard.writeText(text).then(()=>toast('คัดลอก Prompt แล้ว นำไปวางใน AI ได้เลย'),fallback)}catch(err){fallback()}
+  },
+  saveTask(el){
+    const k=el.dataset.k,[track,step,sub]=k.split('-');
+    const st=(document.querySelector(`input[name="s-${k}"]:checked`)||{}).value||'doing';
+    const p={track,step,sub,status:st,work:$('w-'+k).value,link:$('l-'+k).value.trim()};
+    if(p.link&&!/^https?:\/\//i.test(p.link)){toast('ลิงก์ต้องขึ้นต้นด้วย https://',true);return}
+    act(async()=>{S.data=await call('saveProgress',p);delete S.drafts[k];toast(st==='submitted'?'ส่งครูตรวจแล้ว':'บันทึกแล้ว');render()});
+  },
+  /* teacher */
+  tgroup(el,v){act(async()=>{S.tGroup=await call(S.role==='admin'?'adminGroup':'groupDetail',{group_id:v});S.tTab='P';S.tStep=firstPendingStep(S.tGroup);S.tOpen='';render();window.scrollTo(0,0)})},
+  tback(){S.tGroup=null;act(async()=>{S.data=await call(S.role==='admin'?'adminOverview':'teacherHome');render()})},
+  ttab(el,v){S.tTab=v;S.tOpen='';render()},
+  tstep(el,v){S.tStep=+v;S.tOpen='';render();scrollToWork()},
+  topen(el){const k=el.dataset.k;S.tOpen=S.tOpen===k?'':k;render()},
+  review(el){
+    const k=el.dataset.k,[track,step,sub]=k.split('-');
+    const rs=(document.querySelector(`input[name="rv-${k}"]:checked`)||{}).value;
+    if(!rs){toast('เลือกผลการตรวจก่อน',true);return}
+    const p={group_id:S.tGroup.group.group_id,track,step,sub,review_status:rs,review_comment:val('rc-'+k),score:val('rs-'+k)};
+    act(async()=>{S.tGroup=await call(S.role==='admin'?'adminReview':'review',p);toast('บันทึกผลการตรวจแล้ว');render()});
+  },
+  /* admin */
+  atab(el,v){S.adminTab=v;S.adminQ='';S.tGroup=null;render()},
+  agView(el,v){HANDLERS.tgroup(el,v)},
+  agSave(el,v){act(async()=>{S.data=await call('adminSaveRecord',{table:'groups',record:{group_id:v,project_name:val('gn-'+v),teacher_id:$('gt-'+v).value}});toast('บันทึกกลุ่มแล้ว');render()})},
+  adel(el){if(!arm(el))return;act(async()=>{S.data=await call('adminDeleteRecord',{table:el.dataset.t,id:el.dataset.v});toast('ลบแล้ว');render()})},
+  aedit(el){const isS=el.dataset.t==='students';const r=(isS?S.data.students:S.data.teachers).find(x=>(isS?x.student_id:x.teacher_id)===el.dataset.v);if(!r)return;
+    $('ar-id').value=el.dataset.v;$('ar-name').value=r.name;$('ar-phone').value=r.phone;$('ar-dept').value=r.department||'';if(isS)$('ar-level').value=r.level||'';window.scrollTo({top:0,behavior:'smooth'})},
+  asave(el){const isS=el.dataset.t==='students';const rec=isS?{student_id:val('ar-id'),name:val('ar-name'),phone:val('ar-phone'),level:val('ar-level'),department:val('ar-dept')}:{teacher_id:val('ar-id'),name:val('ar-name'),phone:val('ar-phone'),department:val('ar-dept')};
+    act(async()=>{S.data=await call('adminSaveRecord',{table:el.dataset.t,record:rec});toast('บันทึกแล้ว');render()})},
+  aimport(){const t=$('imT').value,rows=parseRows($('imData').value,t);if(!rows.length){toast('ยังไม่มีข้อมูลให้นำเข้า',true);return}
+    act(async()=>{const r=await call('adminImport',{table:t,rows});S.data=r.overview;render();S.adminTab='import';render();
+      $('imResult').innerHTML=`<div class="note ${r.errors.length?'':'ok'}">เพิ่มใหม่ ${r.added} รายการ · อัปเดต ${r.updated} รายการ${r.errors.length?'<br>'+r.errors.map(e).join('<br>'):''}</div>`})},
+  asetting(){act(async()=>{S.data=await call('adminSetSetting',{max_members:val('setMax')});toast('บันทึกการตั้งค่าแล้ว');render()})},
+  apw(){act(async()=>{await call('adminSetPassword',{old:$('pwOld').value,next:$('pwNew').value});S.defaultPw=false;toast('เปลี่ยนรหัสผู้ดูแลแล้ว');$('pwOld').value='';$('pwNew').value=''})}
+};
+function arm(el){const k=el.dataset.a+(el.dataset.v||'');if(armed[k]){delete armed[k];return true}armed[k]=1;el.classList.add('armed');const old=el.textContent;el.textContent='กดอีกครั้งเพื่อยืนยัน';setTimeout(()=>{delete armed[k];if(el.isConnected){el.classList.remove('armed');el.textContent=old}},3500);return false}
+function scrollToWork(){const w=document.querySelector('.work section');if(w&&window.innerWidth<900)w.scrollIntoView({block:'start'})}
+function firstPendingStep(b){const r=b.progress.find(x=>x.track==='P'&&x.review_status==='pending');return r?+r.step:1}
+async function afterLogin(r){
+  S.token=r.token;S.role=r.role;store.set('pbl3_token',r.token);S.reg=null;
+  if(r.role==='student'){S.view='';await routeStudent(await call('me'))}
+  else if(r.role==='teacher'){S.data=await call('teacherHome');S.view='teacher';render()}
+  else {S.data=await call('adminOverview');S.view='admin';S.adminTab='overview';render()}
+  window.scrollTo(0,0);
+}
+function showDemoBanner(){$('demo').innerHTML=`<div class="demo-banner"><div class="wrap"><b>โหมดตัวอย่าง</b><span>ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น เมื่อติดตั้งบน Google Apps Script ระบบจะบันทึกลง Google Sheet จริง · รหัสผู้ดูแลตัวอย่าง: <span class="mono">admin1234</span></span><button class="btn ghost sm" onclick="MockServer.reset();location.reload()">ล้างข้อมูลตัวอย่าง</button></div></div>`}
+boot();
+</script>
+
+</body>
+</html>
